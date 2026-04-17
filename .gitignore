@@ -50,7 +50,7 @@ Thumbs.db
 indexer/data/
 indexer/src/__pycache__/
 crawled_data/
-requirements.txt
+
 
 # Scratch Test Scripts
 indexer/test_speed.py
