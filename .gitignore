@@ -56,3 +56,7 @@ crawled_data/
 indexer/test_speed.py
 indexer/test_pickle.py
 indexer/test_hits.py
+
+.python-version
+pyproject.toml
+uv.lock
