@@ -3,7 +3,7 @@
 import re
 import nltk
 from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
+import Stemmer
 
 # ensure NLTK data is available (download only once)
 for _resource in ("stopwords", "punkt_tab"):
@@ -16,7 +16,7 @@ for _resource in ("stopwords", "punkt_tab"):
     except LookupError:
         nltk.download(_resource, quiet=True)
 
-_STEMMER = PorterStemmer()
+_STEMMER = Stemmer.Stemmer("english")
 _STOP_WORDS: set[str] = set(stopwords.words("english"))
 
 # regex to split on non-alphanumeric characters
@@ -34,8 +34,8 @@ def remove_stopwords(tokens: list[str]) -> list[str]:
 
 
 def stem(tokens: list[str]) -> list[str]:
-    """Apply Porter stemming to each token."""
-    return [_STEMMER.stem(t) for t in tokens]
+    """Apply Porter stemming to each token using PyStemmer."""
+    return _STEMMER.stemWords(tokens)
 
 
 def preprocess(text: str) -> list[str]:

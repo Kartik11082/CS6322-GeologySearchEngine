@@ -2,6 +2,7 @@
 
 import json
 import math
+import multiprocessing
 import time
 from collections import Counter
 from pathlib import Path
@@ -16,6 +17,26 @@ from preprocessor import preprocess
 # inverted_index:  { stem: { doc_id_str: tf, ... }, ... }
 # doc_store:       { doc_id_str: { url, title, doc_len, content_type, depth }, ... }
 # metadata:        { N, avg_dl }
+
+
+def _process_page(page: dict[str, Any]) -> tuple[str, dict[str, int], int, dict[str, Any]]:
+    doc_id = str(page["doc_id"])
+    text = f"{page.get('title', '')} {page.get('text', '')}"
+    stems = preprocess(text)
+
+    doc_len = len(stems)
+    term_counts = dict(Counter(stems))
+
+    doc_meta = {
+        "url": page.get("url", ""),
+        "title": page.get("title", ""),
+        "text_preview": page.get("text", "")[:500],
+        "doc_len": doc_len,
+        "content_type": page.get("content_type", ""),
+        "depth": page.get("depth", 0),
+    }
+
+    return doc_id, term_counts, doc_len, doc_meta
 
 
 def build_index(
@@ -38,32 +59,21 @@ def build_index(
     inverted_index: dict[str, dict[str, int]] = {}
     doc_store: dict[str, dict] = {}
     total_tokens = 0
-
-    for page in pages:
-        doc_id = str(page["doc_id"])
-        # combine title and body for indexing
-        text = f"{page.get('title', '')} {page.get('text', '')}"
-        stems = preprocess(text)
-
-        doc_len = len(stems)
-        total_tokens += doc_len
-
-        doc_store[doc_id] = {
-            "url": page.get("url", ""),
-            "title": page.get("title", ""),
-            "text_preview": page.get("text", "")[:500],
-            "doc_len": doc_len,
-            "content_type": page.get("content_type", ""),
-            "depth": page.get("depth", 0),
-        }
-
-        term_counts = Counter(stems)
-        for term, tf in term_counts.items():
-            if term not in inverted_index:
-                inverted_index[term] = {}
-            inverted_index[term][doc_id] = tf
-
     N = len(pages)
+
+    num_workers = multiprocessing.cpu_count()
+    with multiprocessing.Pool(processes=num_workers) as pool:
+        results = pool.imap_unordered(_process_page, pages, chunksize=1000)
+        
+        for i, (doc_id, term_counts, doc_len, doc_meta) in enumerate(results):
+            total_tokens += doc_len
+            doc_store[doc_id] = doc_meta
+            
+            for term, tf in term_counts.items():
+                if term not in inverted_index:
+                    inverted_index[term] = {}
+                inverted_index[term][doc_id] = tf
+
     avg_dl = total_tokens / N if N > 0 else 0.0
 
     # ── pre-calculate TF-IDF document norms ───────────────────────
