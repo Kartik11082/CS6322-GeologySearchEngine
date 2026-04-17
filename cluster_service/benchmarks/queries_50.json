@@ -1,0 +1,352 @@
+[
+  {
+    "query_id": "Q001",
+    "query_text": "volcanic eruption hawaii",
+    "topic": "volcanology",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q002",
+    "query_text": "lava flow types",
+    "topic": "volcanology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q003",
+    "query_text": "magma composition",
+    "topic": "volcanology",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q004",
+    "query_text": "pyroclastic flow danger",
+    "topic": "volcanology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q005",
+    "query_text": "shield volcano formation",
+    "topic": "volcanology",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q006",
+    "query_text": "caldera collapse",
+    "topic": "volcanology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q007",
+    "query_text": "volcanic ash cloud",
+    "topic": "volcanology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q008",
+    "query_text": "supervolcano yellowstone",
+    "topic": "volcanology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q009",
+    "query_text": "earthquake fault lines california",
+    "topic": "seismology",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q010",
+    "query_text": "seismic wave types",
+    "topic": "seismology",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q011",
+    "query_text": "richter scale measurement",
+    "topic": "seismology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q012",
+    "query_text": "tsunami earthquake trigger",
+    "topic": "seismology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q013",
+    "query_text": "earthquake early warning system",
+    "topic": "seismology",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q014",
+    "query_text": "tectonic plate boundaries",
+    "topic": "seismology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q015",
+    "query_text": "aftershock sequence",
+    "topic": "seismology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q016",
+    "query_text": "deep focus earthquake",
+    "topic": "seismology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q017",
+    "query_text": "quartz crystal formation",
+    "topic": "mineralogy",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q018",
+    "query_text": "mineral hardness mohs scale",
+    "topic": "mineralogy",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q019",
+    "query_text": "igneous rock classification",
+    "topic": "mineralogy",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q020",
+    "query_text": "feldspar types geology",
+    "topic": "mineralogy",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q021",
+    "query_text": "gemstone formation pressure",
+    "topic": "mineralogy",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q022",
+    "query_text": "crystal structure silicate",
+    "topic": "mineralogy",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q023",
+    "query_text": "ore deposit formation",
+    "topic": "mineralogy",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q024",
+    "query_text": "dinosaur fossil record",
+    "topic": "paleontology",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q025",
+    "query_text": "cambrian explosion species",
+    "topic": "paleontology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q026",
+    "query_text": "trilobite fossil identification",
+    "topic": "paleontology",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q027",
+    "query_text": "mass extinction causes",
+    "topic": "paleontology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q028",
+    "query_text": "paleozoic era geology",
+    "topic": "paleontology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q029",
+    "query_text": "fossil preservation conditions",
+    "topic": "paleontology",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q030",
+    "query_text": "rock layer formation",
+    "topic": "stratigraphy",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q031",
+    "query_text": "geologic time scale periods",
+    "topic": "stratigraphy",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q032",
+    "query_text": "sedimentary basin analysis",
+    "topic": "stratigraphy",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q033",
+    "query_text": "unconformity geology",
+    "topic": "stratigraphy",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q034",
+    "query_text": "stratigraphic column reading",
+    "topic": "stratigraphy",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q035",
+    "query_text": "river erosion landforms",
+    "topic": "geomorphology",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q036",
+    "query_text": "glacier carving valleys",
+    "topic": "geomorphology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q037",
+    "query_text": "coastal erosion processes",
+    "topic": "geomorphology",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q038",
+    "query_text": "karst landscape formation",
+    "topic": "geomorphology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q039",
+    "query_text": "desert dune formation",
+    "topic": "geomorphology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q040",
+    "query_text": "isotope dating rocks",
+    "topic": "geochemistry",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q041",
+    "query_text": "carbon dating geology",
+    "topic": "geochemistry",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q042",
+    "query_text": "geochemical anomaly mineral exploration",
+    "topic": "geochemistry",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q043",
+    "query_text": "soil contamination heavy metals",
+    "topic": "geochemistry",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q044",
+    "query_text": "groundwater aquifer types",
+    "topic": "hydrology",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q045",
+    "query_text": "spring water geology",
+    "topic": "hydrology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q046",
+    "query_text": "watershed drainage basin",
+    "topic": "hydrology",
+    "judged_subset": true,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q047",
+    "query_text": "artesian well formation",
+    "topic": "hydrology",
+    "judged_subset": false,
+    "demo_candidate": true
+  },
+  {
+    "query_id": "Q048",
+    "query_text": "geology career opportunities",
+    "topic": "general",
+    "judged_subset": false,
+    "demo_candidate": false
+  },
+  {
+    "query_id": "Q049",
+    "query_text": "best geology universities",
+    "topic": "general",
+    "judged_subset": false,
+    "demo_candidate": false
+  },
+  {
+    "query_id": "Q050",
+    "query_text": "geology field mapping techniques",
+    "topic": "general",
+    "judged_subset": false,
+    "demo_candidate": true
+  }
+]
