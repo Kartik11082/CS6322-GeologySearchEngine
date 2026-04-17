@@ -234,6 +234,8 @@ def hits(
 
     Returns (authority_ranking, hub_ranking) — each a list of (doc_id, score).
     """
+    import time
+    t0 = time.time()
     query_terms = preprocess(query)
     if not query_terms:
         return [], []
@@ -255,6 +257,8 @@ def hits(
 
     if not root_set:
         return [], []
+    t1 = time.time()
+    print(f"[HITS DEBUG] Step 1 (root set): {t1-t0:.4f}s")
 
     # ── Step 2: expand to base set ────────────────────────────────
     base_set = set(root_set)
@@ -274,8 +278,24 @@ def hits(
     nodes = sorted(base_set)
     n = len(nodes)
     node_to_idx = {node: i for i, node in enumerate(nodes)}
+    t2 = time.time()
+    print(f"[HITS DEBUG] Step 2 (base set expansion): {t2-t1:.4f}s")
 
-    # ── Step 3: iterate hub / authority scores ────────────────────
+    # ── Step 3: pre-compute subgraph edges ──────────────────────────
+    in_idx = [[] for _ in range(n)]
+    out_idx = [[] for _ in range(n)]
+    
+    for idx, node in enumerate(nodes):
+        for src in graph.in_links.get(node, set()):
+            if src in node_to_idx:
+                in_idx[idx].append(node_to_idx[src])
+        for tgt in graph.out_links.get(node, set()):
+            if tgt in node_to_idx:
+                out_idx[idx].append(node_to_idx[tgt])
+    t3 = time.time()
+    print(f"[HITS DEBUG] Step 3 (subgraph adj list): {t3-t2:.4f}s")
+
+    # ── Step 4: iterate hub / authority scores ────────────────────
     auth = np.ones(n, dtype=np.float64)
     hub = np.ones(n, dtype=np.float64)
 
@@ -284,18 +304,14 @@ def hits(
         new_hub = np.zeros(n, dtype=np.float64)
 
         # authority update: auth(p) = sum of hub(q) for all q→p
-        for node in nodes:
-            idx = node_to_idx[node]
-            for src in graph.in_links.get(node, set()):
-                if src in node_to_idx:
-                    new_auth[idx] += hub[node_to_idx[src]]
+        for idx in range(n):
+            for src_idx in in_idx[idx]:
+                new_auth[idx] += hub[src_idx]
 
         # hub update: hub(p) = sum of auth(q) for all p→q
-        for node in nodes:
-            idx = node_to_idx[node]
-            for tgt in graph.out_links.get(node, set()):
-                if tgt in node_to_idx:
-                    new_hub[idx] += auth[node_to_idx[tgt]]
+        for idx in range(n):
+            for tgt_idx in out_idx[idx]:
+                new_hub[idx] += auth[tgt_idx]
 
         # normalize
         auth_norm = np.linalg.norm(new_auth)
@@ -309,6 +325,9 @@ def hits(
             auth, hub = new_auth, new_hub
             break
         auth, hub = new_auth, new_hub
+    
+    t4 = time.time()
+    print(f"[HITS DEBUG] Step 4 (math loop): {t4-t3:.4f}s")
 
     authority_ranking = sorted(
         [(nodes[i], float(auth[i])) for i in range(n)],

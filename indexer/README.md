@@ -143,9 +143,9 @@ Three-step NLP pipeline applied to both documents (at index time) and queries (a
 | 3. Stem | `stem(tokens)` | `["geological", "formations"]` → `["geolog", "format"]` |
 | **Full pipeline** | `preprocess(text)` | `"Geological formations include rocks"` → `["geolog", "format", "includ", "rock"]` |
 
-- Uses **NLTK Porter Stemmer** and English stopword list
+- Uses **PyStemmer (C-based over 10x faster)** and NLTK English stopword list
 - Tokenization regex: `[a-z0-9]+` (lowercase alphanumeric only)
-- Downloads NLTK data lazily on first import (silent)
+- Uses NLTK stopwords lazily on first import (silent)
 
 ---
 
@@ -155,7 +155,7 @@ Builds and persists the inverted index.
 
 #### `build_index(pages) → (inverted_index, doc_store, N, avg_dl)`
 
-For each page:
+For each page (processed in parallel via `multiprocessing.Pool` over all CPU cores):
 1. Combines `title` + `clean_text` into a single string
 2. Runs `preprocess()` to get a list of stems
 3. Counts term frequencies with `collections.Counter`
@@ -382,7 +382,7 @@ All output files are in `indexer/data/` and are **git-ignored**. They are regene
 
 ```bash
 # From the project root, with the venv activated:
-uv pip install -r indexer/requirements.txt   # installs nltk, numpy
+uv pip install -r requirements.txt   # installs nltk, numpy, pystemmer, fastapi tools
 ```
 
 ### Build the index (required once, or when new batches arrive)
@@ -446,7 +446,42 @@ for r in results:
     print(f"  {r['snippet'][:100]}...")
 ```
 
-The FastAPI wrapper in `frontend/app.py` does exactly this to serve the Next.js frontend.
+## Running the FastAPI Server
+
+To completely eliminate the 5-13 second CLI boot delay caused by deserializing the JSON indexes, we've implemented a persistent backend server.
+Run the server using Uvicorn from the project root:
+
+```bash
+uvicorn backend.app:app --host 127.0.0.1 --port 8000
+# or
+python backend/app.py
+```
+
+Now you can run blazing-fast (<0.1s) searches via API POST requests to `http://127.0.0.1:8000/api/search`.
+
+### Example API Requests
+
+Once the server is running, you can test it from another terminal using `curl`. Here are examples using all four underlying search methods:
+
+**1. BM25 (Default method — Best overall text relevance)**
+```bash
+curl -X POST http://127.0.0.1:8000/api/search -H "Content-Type: application/json" -d "{\"query\": \"sedimentary rock\", \"method\": \"bm25\", \"top_k\": 5}"
+```
+
+**2. TF-IDF (Classic vector space model)**
+```bash
+curl -X POST http://127.0.0.1:8000/api/search -H "Content-Type: application/json" -d "{\"query\": \"volcanic eruption\", \"method\": \"tfidf\", \"top_k\": 5}"
+```
+
+**3. Topic-Specific PageRank (Boosts high-quality geology pages)**
+```bash
+curl -X POST http://127.0.0.1:8000/api/search -H "Content-Type: application/json" -d "{\"query\": \"mineral deposits\", \"method\": \"pagerank\", \"top_k\": 5}"
+```
+
+**4. HITS (Returns authoritative pages on the topic)**
+```bash
+curl -X POST http://127.0.0.1:8000/api/search -H "Content-Type: application/json" -d "{\"query\": \"plate tectonics\", \"method\": \"hits\", \"top_k\": 5}"
+```
 
 ---
 

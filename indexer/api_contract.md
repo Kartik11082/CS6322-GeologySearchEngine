@@ -95,15 +95,11 @@ If an invalid parameter is passed or an internal failure occurs, an error payloa
 
 | Field | Type | Description |
 |---|---|---|
-| `status` | `string` | Always `"error"`. |
 | `detail` | `string/array` | A human-readable description of what went wrong, or Pydantic validation error lists. |
-| `error_code` | `string` | Programmatic error code (e.g., `"INVALID_METHOD"`, `"INTERNAL_SERVER_ERROR"`). |
 
 ### Example Error Response:
 ```json
 {
-  "status": "error",
-  "detail": "Invalid method 'neural'. Must be one of: tfidf, bm25, pagerank, hits.",
-  "error_code": "INVALID_METHOD"
+  "detail": "Invalid method 'neural'. Must be one of: tfidf, bm25, pagerank, hits."
 }
 ```
