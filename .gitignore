@@ -60,3 +60,5 @@ indexer/test_hits.py
 .python-version
 pyproject.toml
 uv.lock
+
+crawler/output
