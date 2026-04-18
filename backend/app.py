@@ -7,6 +7,10 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "indexer" / "src"))
 
+sys.path.insert(0, str(PROJECT_ROOT / "expander"))
+from core import QueryExpander
+
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -73,6 +77,57 @@ async def perform_search(req: SearchRequest):
     
     return {
         "status": "success",
+        "metadata": {
+            "total_results": len(results),
+            "execution_time_ms": execution_time_ms
+        },
+        "results": results
+    }
+
+class ExpandRequest(BaseModel):
+    query: str = Field(..., description="The query string to expand.")
+    method: str = Field("rocchio", description="Expansion method: rocchio, association, scalar, metric")
+    top_k: int = Field(10, description="Number of results for the final search.")
+    relevant_doc_ids: list[str] = Field(default_factory=list, description="For Rocchio: IDs of relevant docs.")
+    irrelevant_doc_ids: list[str] = Field(default_factory=list, description="For Rocchio: IDs of non-relevant docs.")
+
+@app.post("/api/expand")
+async def perform_expansion(req: ExpandRequest):
+    if not req.query.strip():
+        raise HTTPException(status_code=400, detail="Query cannot be empty.")
+        
+    expander = QueryExpander(engine)
+    t0 = time.time()
+    
+    try:
+        if req.method == "rocchio":
+            # For Rocchio, we pass the explicit manual judgments
+            expanded_query = expander.expand_rocchio(
+                query=req.query, 
+                relevant_doc_ids=req.relevant_doc_ids, 
+                irrelevant_doc_ids=req.irrelevant_doc_ids
+            )
+        elif req.method == "association":
+            expanded_query = expander.expand_association(req.query, normalized=False)
+        elif req.method == "scalar":
+            expanded_query = expander.expand_scalar(req.query)
+        elif req.method == "metric":
+            expanded_query = expander.expand_metric(req.query)
+        else:
+            raise HTTPException(status_code=422, detail=f"Invalid expansion method: {req.method}")
+            
+        # Run the final search with the newly expanded query
+        results = engine.search(query=expanded_query, method="bm25", top_k=req.top_k)
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+        
+    execution_time_ms = round((time.time() - t0) * 1000, 2)
+    
+    return {
+        "status": "success",
+        "original_query": req.query,
+        "expanded_query": expanded_query,
         "metadata": {
             "total_results": len(results),
             "execution_time_ms": execution_time_ms
