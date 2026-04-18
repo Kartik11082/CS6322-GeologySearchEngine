@@ -62,3 +62,8 @@ pyproject.toml
 uv.lock
 
 crawler/output
+
+.claude/*
+CLAUDE.md
+DesignLanguage.md
+test_app.py

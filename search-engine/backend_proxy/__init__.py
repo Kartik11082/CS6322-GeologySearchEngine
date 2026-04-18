@@ -1,0 +1,1 @@
+"""Search engine proxy package."""
