@@ -505,8 +505,6 @@ For each method we record (in `expansion_report.txt` after `python expander/eval
 
 # Part 2 — Technical Flow (How Everything Works)
 
-This section is the "show me how it actually runs" walkthrough — useful for the demo narration.
-
 ## 2.1 The Big Picture (what the user sees)
 
 1. The user opens **`http://localhost:5173`** — a React SPA.
@@ -647,16 +645,3 @@ cd indexer
 python src/search.py -q "earthquake fault" -m bm25 -k 10
 python src/search.py -q "volcanic eruption" -m pagerank
 ```
-
----
-
-## Demo-Day Narration (suggested order)
-
-1. **"Here is the problem"** — show the architecture diagram (§1.1).
-2. **"Here's the data we have"** — quote crawl stats: 604 pages, 28 k edges; graph stats: 101 k nodes, 3.2 M edges.
-3. **"Run a query in BM25"** — show top-10 for _sedimentary rock_.
-4. **"Switch to PageRank"** — same query, watch USGS hub pages float up.
-5. **"Switch to HITS"** — show authority pages for _plate tectonics_.
-6. **"Apply clustering"** — Clustered tab on _fault_ — note the geology-fault vs. tectonic-fault separation.
-7. **"Apply query expansion"** — _yellowstone_ → _caldera, supervolcano, magma_; show new results.
-8. **"Compare to Google / Bing"** — open the comparison tabs for one domain query and one general query; explain when our engine wins (focused corpus, biased PageRank) and when it doesn't (freshness, scale).
