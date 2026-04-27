@@ -422,6 +422,33 @@ input, select {
   flex-wrap: wrap;
 }
 
+.pane-attrib {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--text-3);
+  font-family: var(--ui);
+}
+.pane-attrib .pa-role {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+  color: var(--text-3);
+}
+.pane-attrib .pa-name {
+  color: var(--text-2);
+  font-weight: 500;
+  padding-left: 8px;
+  border-left: 1px solid var(--border);
+}
+.pane-attrib .pa-netid {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--text-3);
+}
+
 .method-tag {
   font-family: var(--ui);
   font-size: 11px;
@@ -532,13 +559,13 @@ input, select {
 .rcard {
   display: grid;
   grid-template-columns: 28px 1fr 80px;
-  gap: 16px;
-  padding: 18px 12px;
-  border-bottom: 1px solid var(--border);
+  grid-template-rows: auto auto;
+  column-gap: 16px;
+  row-gap: 0;
+  padding: 18px 12px 0;
   transition: background 0.15s;
 }
 .rcard:hover { background: var(--surface); }
-.rcard:last-child { border-bottom: 0; }
 
 .rnk {
   font-size: 12px;
@@ -659,17 +686,16 @@ input, select {
   margin-bottom: 6px;
 }
 .rsbar {
-  height: 3px;
-  background: var(--surface-2);
-  border-radius: 999px;
+  grid-column: 1 / -1;
+  height: 2px;
+  background: var(--border);
   overflow: hidden;
-  margin-left: auto;
-  width: 70px;
+  width: 100%;
+  margin-top: 16px;
 }
 .rsfill {
   height: 100%;
   background: var(--accent);
-  border-radius: 999px;
   transition: width 0.4s ease;
 }
 
@@ -1158,6 +1184,55 @@ input, select {
 .example-block .example-rows dd {
   margin: 0;
   color: var(--text-2);
+}
+
+.team-list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.team-list li {
+  display: grid;
+  grid-template-columns: 220px 1fr 120px;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+.team-list li:last-child { border-bottom: 0; }
+.team-role {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+}
+.team-name {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+}
+.team-netid {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+  text-align: right;
+  letter-spacing: 0.02em;
+}
+@media (max-width: 600px) {
+  .team-list li {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+  .team-netid { text-align: left; }
 }
 
 /* ============================================================

@@ -3,61 +3,81 @@ import { startTransition, useEffect, useMemo, useRef, useState } from "react";
 const API_BASE = (import.meta.env.VITE_PROXY_API_BASE || "").replace(/\/$/, "");
 
 const MODEL_CONFIG = [
-  { key: "bm25",     label: "BM25",     description: "Okapi BM25 — primary lexical relevance model." },
-  { key: "tfidf",    label: "TF-IDF",   description: "Vector-space cosine similarity baseline." },
+  { key: "bm25", label: "BM25", description: "Okapi BM25 — primary lexical relevance model." },
+  { key: "tfidf", label: "TF-IDF", description: "Vector-space cosine similarity baseline." },
   { key: "pagerank", label: "PageRank", description: "BM25 blended with link-authority from the crawl graph." },
-  { key: "hits",     label: "HITS",     description: "Query-dependent authority scoring (Kleinberg)." },
+  { key: "hits", label: "HITS", description: "Query-dependent authority scoring (Kleinberg)." },
 ];
 
 const TAB_CONFIG = [
-  { key: "models",    label: "Relevance Models" },
+  { key: "models", label: "Relevance Models" },
   { key: "clustered", label: "Clustered" },
-  { key: "expanded",  label: "Query Expansion" },
-  { key: "compare",   label: "Compare Engines" },
+  { key: "expanded", label: "Query Expansion" },
+  { key: "compare", label: "Compare Engines" },
 ];
 
 const EXPANSION_OPTIONS = [
   { value: "association", label: "Association" },
-  { value: "scalar",      label: "Scalar" },
-  { value: "metric",      label: "Metric" },
+  { value: "scalar", label: "Scalar" },
+  { value: "metric", label: "Metric" },
 ];
 
 const CLUSTER_OPTIONS = [
-  { value: "flat",     label: "Flat" },
-  { value: "ward",     label: "Ward" },
+  { value: "flat", label: "Flat" },
+  { value: "ward", label: "Ward" },
   { value: "complete", label: "Complete" },
 ];
+
+const TEAM = {
+  crawler: { role: "Crawler", name: "Zafeer Rangoonwala", netid: "abc230001" },
+  indexer: { role: "Indexer", name: "Rahul Patil", netid: "abc230001" },
+  interface: { role: "Interface", name: "Kartik Karkera", netid: "KXK230091" },
+  cluster: { role: "Clustering", name: "Preeti Vasaikar", netid: "abc230001" },
+  expand: { role: "Query Expansion", name: "Uddesh Singh ", netid: "abc230001" },
+};
+
+function PaneAttrib({ who }) {
+  const t = TEAM[who];
+  if (!t) return null;
+  return (
+    <div className="pane-attrib">
+      <span className="pa-role">{t.role}</span>
+      <span className="pa-name">{t.name}</span>
+      <span className="pa-netid">{t.netid}</span>
+    </div>
+  );
+}
 
 const emptyPanel = () => ({ status: "idle", data: null, error: "" });
 
 const createInitialResults = () => ({
-  models:    Object.fromEntries(MODEL_CONFIG.map((m) => [m.key, emptyPanel()])),
-  expanded:  emptyPanel(),
+  models: Object.fromEntries(MODEL_CONFIG.map((m) => [m.key, emptyPanel()])),
+  expanded: emptyPanel(),
   clustered: emptyPanel(),
-  google:    emptyPanel(),
-  bing:      emptyPanel(),
+  google: emptyPanel(),
+  bing: emptyPanel(),
 });
 
 function readInitialState() {
   const p = new URLSearchParams(window.location.search);
   const topKParam = Number(p.get("topK"));
   return {
-    query:           p.get("q") || "",
-    topK:            Number.isFinite(topKParam) && topKParam > 0 ? topKParam : 10,
-    expansionMethod: p.get("expand")  || "association",
-    clusterMethod:   p.get("cluster") || "flat",
-    tab:             p.get("tab")     || "models",
-    view:            p.get("view")    || "search",
+    query: p.get("q") || "",
+    topK: Number.isFinite(topKParam) && topKParam > 0 ? topKParam : 10,
+    expansionMethod: p.get("expand") || "association",
+    clusterMethod: p.get("cluster") || "flat",
+    tab: p.get("tab") || "models",
+    view: p.get("view") || "search",
   };
 }
 
 function syncUrl({ query, topK, expansionMethod, clusterMethod, tab, view }) {
   const p = new URLSearchParams();
   if (query) p.set("q", query);
-  p.set("topK",    String(topK));
-  p.set("expand",  expansionMethod);
+  p.set("topK", String(topK));
+  p.set("expand", expansionMethod);
   p.set("cluster", clusterMethod);
-  p.set("tab",     tab);
+  p.set("tab", tab);
   if (view && view !== "search") p.set("view", view);
   window.history.replaceState({}, "", `${window.location.pathname}?${p.toString()}`);
 }
@@ -65,7 +85,7 @@ function syncUrl({ query, topK, expansionMethod, clusterMethod, tab, view }) {
 function scoreWidth(value, items, field = "score") {
   if (!items?.length || typeof value !== "number" || Number.isNaN(value)) return 0;
   const vals = items.map((it) => Number(it[field] ?? 0)).filter(Number.isFinite);
-  const max  = Math.max(...vals, 1);
+  const max = Math.max(...vals, 1);
   return Math.max(6, Math.min(100, (value / max) * 100));
 }
 
@@ -80,16 +100,16 @@ function domainFromUrl(url) {
 
 function matchStrength(item) {
   const v = Number(item.score ?? item.baseline_score ?? 0);
-  if (v >= 0.7) return { label: "Strong",   cls: "str" };
+  if (v >= 0.7) return { label: "Strong", cls: "str" };
   if (v >= 0.3) return { label: "Moderate", cls: "mod" };
-  return           { label: "Weak",     cls: "wek" };
+  return { label: "Weak", cls: "wek" };
 }
 
 async function requestJson(path, { method = "GET", body } = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
     method,
     headers: body ? { "Content-Type": "application/json" } : undefined,
-    body:    body ? JSON.stringify(body) : undefined,
+    body: body ? JSON.stringify(body) : undefined,
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
@@ -130,8 +150,8 @@ function SkeletonList({ count = 5 }) {
 
 function getStatus(panel, emptyMessage, skeletonCount = 5) {
   if (panel.status === "loading") return <SkeletonList count={skeletonCount} />;
-  if (panel.status === "error")   return <div className="state err">{panel.error}</div>;
-  if (!panel.data)                return <div className="state muted">{emptyMessage}</div>;
+  if (panel.status === "error") return <div className="state err">{panel.error}</div>;
+  if (!panel.data) return <div className="state muted">{emptyMessage}</div>;
   return null;
 }
 
@@ -245,8 +265,8 @@ function TabBar({ activeTab, setActiveTab, counts }) {
    RESULT CARD
    ================================================================ */
 function ResultCard({ item, items, scoreField = "score", showClusterTag = false }) {
-  const width     = scoreWidth(Number(item[scoreField] ?? 0), items, scoreField);
-  const strength  = matchStrength(item);
+  const width = scoreWidth(Number(item[scoreField] ?? 0), items, scoreField);
+  const strength = matchStrength(item);
   const rankDelta = Number(item.rank_delta ?? 0);
 
   return (
@@ -277,8 +297,8 @@ function ResultCard({ item, items, scoreField = "score", showClusterTag = false 
       <aside className="rsc">
         <span className="sclbl">Score</span>
         <strong>{Number(item[scoreField] ?? 0).toFixed(3)}</strong>
-        <div className="rsbar"><div className="rsfill" style={{ width: `${width}%` }} /></div>
       </aside>
+      <div className="rsbar"><div className="rsfill" style={{ width: `${width}%` }} /></div>
     </article>
   );
 }
@@ -287,7 +307,7 @@ function ResultCard({ item, items, scoreField = "score", showClusterTag = false 
    MODELS PANE
    ================================================================ */
 function ModelsPane({ results, activeModel, setActiveModel }) {
-  const panel  = results.models[activeModel];
+  const panel = results.models[activeModel];
   const active = MODEL_CONFIG.find((m) => m.key === activeModel);
   const status = getStatus(panel, `No ${active.label} results yet.`);
 
@@ -311,6 +331,7 @@ function ModelsPane({ results, activeModel, setActiveModel }) {
           {active.label}
           <span className="info-tip" aria-label={active.description}>?</span>
         </h2>
+        <PaneAttrib who="indexer" />
       </div>
 
       <div className="results">
@@ -331,7 +352,7 @@ function ModelsPane({ results, activeModel, setActiveModel }) {
    ================================================================ */
 function ClusterSidebar({ clusters, activeClusterId, setActiveClusterId }) {
   const populated = clusters.filter((c) => (c.result_count ?? 0) > 0);
-  const empty     = clusters.filter((c) => (c.result_count ?? 0) === 0);
+  const empty = clusters.filter((c) => (c.result_count ?? 0) === 0);
 
   return (
     <aside className="cside">
@@ -378,6 +399,7 @@ function ClusteredPane({ panel, activeClusterId, setActiveClusterId, clusterMeth
         <section>
           <div className="pane-intro">
             <h2>Clustered Results</h2>
+            <PaneAttrib who="cluster" />
           </div>
           {status}
         </section>
@@ -385,13 +407,13 @@ function ClusteredPane({ panel, activeClusterId, setActiveClusterId, clusterMeth
     );
   }
 
-  const clusters      = panel.data.clusters  || [];
-  const reranked      = panel.data.reranked  || [];
-  const filtered      = activeClusterId
+  const clusters = panel.data.clusters || [];
+  const reranked = panel.data.reranked || [];
+  const filtered = activeClusterId
     ? reranked.filter((it) => it.cluster_id === activeClusterId)
     : reranked;
   const activeCluster = clusters.find((c) => c.id === activeClusterId);
-  const weights       = panel.data.explanations?.weights || {};
+  const weights = panel.data.explanations?.weights || {};
 
   return (
     <>
@@ -407,6 +429,7 @@ function ClusteredPane({ panel, activeClusterId, setActiveClusterId, clusterMeth
             <span className="method-tag">{clusterMethod}</span>
             <span className="info-tip" aria-label="Results from the relevance backbone grouped by topical cluster, then reranked using cluster affinity and support. Score = baseline × 0.7 + cluster_affinity × 0.2 + cluster_support × 0.1">?</span>
           </h2>
+          <PaneAttrib who="cluster" />
         </div>
 
         <div className="hint">
@@ -459,6 +482,7 @@ function ExpandedPane({ panel, searchQuery, expansionMethod }) {
           <h2>Query Expansion
             <span className="info-tip" aria-label="Pseudo-relevance feedback adds domain terms to the original query using co-occurrence statistics over top-ranked documents.">?</span>
           </h2>
+          <PaneAttrib who="expand" />
         </div>
         {status}
       </section>
@@ -478,6 +502,7 @@ function ExpandedPane({ panel, searchQuery, expansionMethod }) {
           <span className="method-tag">{expansionMethod}</span>
           <span className="info-tip" aria-label="The original query is expanded with terms from a co-occurrence cluster over top-ranked documents, then re-searched using the same relevance model.">?</span>
         </h2>
+        <PaneAttrib who="expand" />
       </div>
 
       <div className="expbanner">
@@ -511,20 +536,20 @@ function ExpandedPane({ panel, searchQuery, expansionMethod }) {
    COMPARE PANE (GeoSearch vs Google vs Bing)
    ================================================================ */
 function ComparePane({ results }) {
-  const geo    = results.models.bm25;
+  const geo = results.models.bm25;
   const google = results.google;
-  const bing   = results.bing;
+  const bing = results.bing;
 
-  const geoItems    = geo.data?.results    || [];
+  const geoItems = geo.data?.results || [];
   const googleItems = google.data?.results || [];
-  const bingItems   = bing.data?.results   || [];
+  const bingItems = bing.data?.results || [];
 
   const googleDomains = new Set(googleItems.map((r) => domainFromUrl(r.url)));
-  const bingDomains   = new Set(bingItems.map((r)   => domainFromUrl(r.url)));
-  const geoDomains    = new Set(geoItems.map((r)    => domainFromUrl(r.url)));
+  const bingDomains = new Set(bingItems.map((r) => domainFromUrl(r.url)));
+  const geoDomains = new Set(geoItems.map((r) => domainFromUrl(r.url)));
 
   const geoVsGoogle = geoItems.filter((r) => googleDomains.has(domainFromUrl(r.url))).length;
-  const geoVsBing   = geoItems.filter((r) => bingDomains.has(domainFromUrl(r.url))).length;
+  const geoVsBing = geoItems.filter((r) => bingDomains.has(domainFromUrl(r.url))).length;
 
   const maxRows = Math.max(geoItems.length, googleItems.length, bingItems.length, 1);
 
@@ -532,7 +557,7 @@ function ComparePane({ results }) {
     const d = domainFromUrl(url);
     const tags = [];
     if (googleDomains.has(d)) tags.push({ label: "G", title: "Also in Google", cls: "ov-g" });
-    if (bingDomains.has(d))   tags.push({ label: "B", title: "Also in Bing",   cls: "ov-b" });
+    if (bingDomains.has(d)) tags.push({ label: "B", title: "Also in Bing", cls: "ov-b" });
     return tags;
   }
 
@@ -588,7 +613,7 @@ function ComparePane({ results }) {
 
   function ExCol({ panel, label, cls, geoDomainSet }) {
     const status = getStatus(panel, `${label} results unavailable.`, 5);
-    const items  = panel.data?.results || [];
+    const items = panel.data?.results || [];
     return (
       <div className="cmp-col">
         <ColHeader label={label} cls={cls} count={items.length} />
@@ -619,19 +644,20 @@ function ComparePane({ results }) {
           Compare Engines
           <span className="info-tip" aria-label="GeoSearch BM25 results alongside live Google and Bing results for the same query. Shared domains are highlighted across columns.">?</span>
         </h2>
+        <PaneAttrib who="interface" />
       </div>
       <div className="cmp-grid">
         <GeoCol />
         <ExCol panel={google} label="Google" cls="cmp-google" geoDomainSet={geoDomains} />
-        <ExCol panel={bing}   label="Bing"   cls="cmp-bing"   geoDomainSet={geoDomains} />
+        <ExCol panel={bing} label="Bing" cls="cmp-bing" geoDomainSet={geoDomains} />
       </div>
     </section>
   );
 }
 
 /* ================================================================
-   ABOUT VIEW
-   ================================================================ */
+    ABOUT VIEW
+  ================================================================ */
 function AboutView({ onBack }) {
   return (
     <div className="about">
@@ -643,6 +669,37 @@ function AboutView({ onBack }) {
           The interface you are using embeds five distinct result frames: four of our own relevance models, a clustered
           view, a query-expansion view, and live Google and Bing results for side-by-side comparison.
         </p>
+      </div>
+
+      <div className="about-q">
+        <h3>Team</h3>
+        <ul className="team-list">
+          <li>
+            <span className="team-role">Crawler</span>
+            <span className="team-name">Zafeer Rangoonwala</span>
+            <span className="team-netid">zxr240004</span>
+          </li>
+          <li>
+            <span className="team-role">Indexer</span>
+            <span className="team-name">Rahul Patil</span>
+            <span className="team-netid">rxp240025</span>
+          </li>
+          <li>
+            <span className="team-role">Interface</span>
+            <span className="team-name">Kartik Karkera</span>
+            <span className="team-netid">KXK230091</span>
+          </li>
+          <li>
+            <span className="team-role">Clustering</span>
+            <span className="team-name">Preeti Vasaikar</span>
+            <span className="team-netid">pxv230036</span>
+          </li>
+          <li>
+            <span className="team-role">Query Expansion</span>
+            <span className="team-name">Uddesh Singh</span>
+            <span className="team-netid">uxs230004</span>
+          </li>
+        </ul>
       </div>
 
       <div className="about-q">
@@ -785,27 +842,27 @@ function AboutView({ onBack }) {
    ROOT APP
    ================================================================ */
 export default function App() {
-  const initial      = readInitialState();
+  const initial = readInitialState();
   const requestIdRef = useRef(0);
 
-  const [queryInput,       setQueryInput]       = useState(initial.query);
-  const [topK,             setTopK]             = useState(initial.topK);
-  const [expansionMethod,  setExpansionMethod]  = useState(initial.expansionMethod);
-  const [clusterMethod,    setClusterMethod]    = useState(initial.clusterMethod);
-  const [activeTab,        setActiveTab]        = useState(initial.tab);
-  const [activeModel,      setActiveModel]      = useState("bm25");
-  const [activeClusterId,  setActiveClusterId]  = useState(null);
-  const [results,          setResults]          = useState(createInitialResults);
-  const [lastSearch,       setLastSearch]       = useState(initial.query);
-  const [view,             setView]             = useState(initial.view);
+  const [queryInput, setQueryInput] = useState(initial.query);
+  const [topK, setTopK] = useState(initial.topK);
+  const [expansionMethod, setExpansionMethod] = useState(initial.expansionMethod);
+  const [clusterMethod, setClusterMethod] = useState(initial.clusterMethod);
+  const [activeTab, setActiveTab] = useState(initial.tab);
+  const [activeModel, setActiveModel] = useState("bm25");
+  const [activeClusterId, setActiveClusterId] = useState(null);
+  const [results, setResults] = useState(createInitialResults);
+  const [lastSearch, setLastSearch] = useState(initial.query);
+  const [view, setView] = useState(initial.view);
 
   const hasSearched = !!lastSearch;
 
   const tabCounts = useMemo(() => ({
-    models:    results.models[activeModel]?.data?.results?.length,
+    models: results.models[activeModel]?.data?.results?.length,
     clustered: results.clustered.data?.reranked?.length,
-    expanded:  results.expanded.data?.results?.length,
-    compare:   results.google.status === "success" || results.bing.status === "success" ? 3 : undefined,
+    expanded: results.expanded.data?.results?.length,
+    compare: results.google.status === "success" || results.bing.status === "success" ? 3 : undefined,
   }), [results, activeModel]);
 
   useEffect(() => {
@@ -813,6 +870,40 @@ export default function App() {
     void runSearch(initial.query);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const didMountExpandRef = useRef(false);
+  useEffect(() => {
+    if (!didMountExpandRef.current) { didMountExpandRef.current = true; return; }
+    if (!lastSearch) return;
+    const rid = requestIdRef.current;
+    syncUrl({ query: lastSearch, topK, expansionMethod, clusterMethod, tab: activeTab, view });
+    startTransition(() =>
+      setResults((cur) => ({ ...cur, expanded: { status: "loading", data: null, error: "" } })),
+    );
+    requestJson("/api/expand", { method: "POST", body: { query: lastSearch, method: expansionMethod, top_k: topK } })
+      .then((data) => patchResults(rid, (cur) => ({ ...cur, expanded: { status: "success", data, error: "" } })))
+      .catch((err) => patchResults(rid, (cur) => ({ ...cur, expanded: { status: "error", data: null, error: err.message } })));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expansionMethod]);
+
+  const didMountClusterRef = useRef(false);
+  useEffect(() => {
+    if (!didMountClusterRef.current) { didMountClusterRef.current = true; return; }
+    if (!lastSearch) return;
+    const rid = requestIdRef.current;
+    syncUrl({ query: lastSearch, topK, expansionMethod, clusterMethod, tab: activeTab, view });
+    setActiveClusterId(null);
+    startTransition(() =>
+      setResults((cur) => ({ ...cur, clustered: { status: "loading", data: null, error: "" } })),
+    );
+    requestJson("/api/clustered-search", {
+      method: "POST",
+      body: { query: lastSearch, cluster_method: clusterMethod, baseline_method: "combined", top_k: topK },
+    })
+      .then((data) => patchResults(rid, (cur) => ({ ...cur, clustered: { status: "success", data, error: "" } })))
+      .catch((err) => patchResults(rid, (cur) => ({ ...cur, clustered: { status: "error", data: null, error: err.message } })));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clusterMethod]);
 
   function patchResults(requestId, updater) {
     if (requestIdRef.current !== requestId) return;
@@ -848,10 +939,10 @@ export default function App() {
         models: Object.fromEntries(
           MODEL_CONFIG.map((m) => [m.key, { status: "loading", data: null, error: "" }]),
         ),
-        expanded:  { status: "loading", data: null, error: "" },
+        expanded: { status: "loading", data: null, error: "" },
         clustered: { status: "loading", data: null, error: "" },
-        google:    { status: "loading", data: null, error: "" },
-        bing:      { status: "loading", data: null, error: "" },
+        google: { status: "loading", data: null, error: "" },
+        bing: { status: "loading", data: null, error: "" },
       }),
     );
 
@@ -872,8 +963,8 @@ export default function App() {
     });
 
     requestJson("/api/expand", { method: "POST", body: { query: q, method: expansionMethod, top_k: topK } })
-      .then((data) => patchResults(rid, (cur) => ({ ...cur, expanded:  { status: "success", data, error: "" } })))
-      .catch((err) => patchResults(rid, (cur) => ({ ...cur, expanded:  { status: "error", data: null, error: err.message } })));
+      .then((data) => patchResults(rid, (cur) => ({ ...cur, expanded: { status: "success", data, error: "" } })))
+      .catch((err) => patchResults(rid, (cur) => ({ ...cur, expanded: { status: "error", data: null, error: err.message } })));
 
     requestJson("/api/clustered-search", {
       method: "POST",
