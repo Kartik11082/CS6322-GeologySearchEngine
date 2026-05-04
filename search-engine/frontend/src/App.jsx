@@ -29,11 +29,11 @@ const CLUSTER_OPTIONS = [
 ];
 
 const TEAM = {
-  crawler: { role: "Crawler", name: "Zafeer Rangoonwala", netid: "abc230001" },
-  indexer: { role: "Indexer", name: "Rahul Patil", netid: "abc230001" },
-  interface: { role: "Interface", name: "Kartik Karkera", netid: "KXK230091" },
-  cluster: { role: "Clustering", name: "Preeti Vasaikar", netid: "abc230001" },
-  expand: { role: "Query Expansion", name: "Uddesh Singh ", netid: "abc230001" },
+  crawler:   { role: "Crawler",         name: "Zafeer Rangoonwala", netid: "zxr240004" },
+  indexer:   { role: "Indexer",         name: "Rahul Patil",        netid: "rxp240025" },
+  interface: { role: "Interface",       name: "Kartik Karkera",     netid: "KXK230091" },
+  cluster:   { role: "Clustering",      name: "Preeti Vasaikar",    netid: "pxv230036" },
+  expand:    { role: "Query Expansion", name: "Uddesh Singh",       netid: "uxs230004" },
 };
 
 function PaneAttrib({ who }) {
