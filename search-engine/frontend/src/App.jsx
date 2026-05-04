@@ -17,6 +17,7 @@ const TAB_CONFIG = [
 ];
 
 const EXPANSION_OPTIONS = [
+  { value: "rocchio", label: "Rocchio" },
   { value: "association", label: "Association" },
   { value: "scalar", label: "Scalar" },
   { value: "metric", label: "Metric" },
@@ -61,10 +62,14 @@ const createInitialResults = () => ({
 function readInitialState() {
   const p = new URLSearchParams(window.location.search);
   const topKParam = Number(p.get("topK"));
+  const initialExpansionMethod = p.get("expand") || "association";
+  // #region agent log
+  fetch('http://127.0.0.1:7676/ingest/42b47de6-4aeb-471e-a7f7-2c4cc9c845e0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'784b16'},body:JSON.stringify({sessionId:'784b16',runId:'pre-fix',hypothesisId:'H1_H2',location:'search-engine/frontend/src/App.jsx:readInitialState',message:'initial expansion method parsed from URL',data:{url_expand:p.get("expand"),resolved_expand:initialExpansionMethod},timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
   return {
     query: p.get("q") || "",
     topK: Number.isFinite(topKParam) && topKParam > 0 ? topKParam : 10,
-    expansionMethod: p.get("expand") || "association",
+    expansionMethod: initialExpansionMethod,
     clusterMethod: p.get("cluster") || "flat",
     tab: p.get("tab") || "models",
     view: p.get("view") || "search",
@@ -120,6 +125,26 @@ async function requestJson(path, { method = "GET", body } = {}) {
     throw new Error(detail);
   }
   return data;
+}
+
+async function buildExpandBody(query, expansionMethod, topK) {
+  if (expansionMethod !== "rocchio") {
+    return { query, method: expansionMethod, top_k: topK };
+  }
+
+  const baseline = await requestJson("/api/search", {
+    method: "POST",
+    body: { query, method: "bm25", top_k: 3 },
+  });
+  const docs = baseline?.results || [];
+  const relevant_doc_ids = docs.slice(0, 2).map((d) => String(d.doc_id));
+  const irrelevant_doc_ids = docs.slice(2, 3).map((d) => String(d.doc_id));
+
+  // #region agent log
+  fetch('http://127.0.0.1:7676/ingest/42b47de6-4aeb-471e-a7f7-2c4cc9c845e0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'784b16'},body:JSON.stringify({sessionId:'784b16',runId:'post-fix',hypothesisId:'H5',location:'search-engine/frontend/src/App.jsx:buildExpandBody',message:'rocchio feedback docs derived from bm25',data:{query,relevantCount:relevant_doc_ids.length,irrelevantCount:irrelevant_doc_ids.length},timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+
+  return { query, method: expansionMethod, top_k: topK, relevant_doc_ids, irrelevant_doc_ids };
 }
 
 /* ================================================================
@@ -876,11 +901,15 @@ export default function App() {
     if (!didMountExpandRef.current) { didMountExpandRef.current = true; return; }
     if (!lastSearch) return;
     const rid = requestIdRef.current;
+    // #region agent log
+    fetch('http://127.0.0.1:7676/ingest/42b47de6-4aeb-471e-a7f7-2c4cc9c845e0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'784b16'},body:JSON.stringify({sessionId:'784b16',runId:'pre-fix',hypothesisId:'H2_H3',location:'search-engine/frontend/src/App.jsx:useEffect(expansionMethod)',message:'expansion rerun triggered',data:{expansionMethod,lastSearch,topK},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     syncUrl({ query: lastSearch, topK, expansionMethod, clusterMethod, tab: activeTab, view });
     startTransition(() =>
       setResults((cur) => ({ ...cur, expanded: { status: "loading", data: null, error: "" } })),
     );
-    requestJson("/api/expand", { method: "POST", body: { query: lastSearch, method: expansionMethod, top_k: topK } })
+    buildExpandBody(lastSearch, expansionMethod, topK)
+      .then((expandBody) => requestJson("/api/expand", { method: "POST", body: expandBody }))
       .then((data) => patchResults(rid, (cur) => ({ ...cur, expanded: { status: "success", data, error: "" } })))
       .catch((err) => patchResults(rid, (cur) => ({ ...cur, expanded: { status: "error", data: null, error: err.message } })));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -962,8 +991,14 @@ export default function App() {
         );
     });
 
-    requestJson("/api/expand", { method: "POST", body: { query: q, method: expansionMethod, top_k: topK } })
-      .then((data) => patchResults(rid, (cur) => ({ ...cur, expanded: { status: "success", data, error: "" } })))
+    buildExpandBody(q, expansionMethod, topK)
+      .then((expandBody) => requestJson("/api/expand", { method: "POST", body: expandBody }))
+      .then((data) => {
+        // #region agent log
+        fetch('http://127.0.0.1:7676/ingest/42b47de6-4aeb-471e-a7f7-2c4cc9c845e0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'784b16'},body:JSON.stringify({sessionId:'784b16',runId:'post-fix',hypothesisId:'H3_H4',location:'search-engine/frontend/src/App.jsx:runSearch:expand_success',message:'expand request succeeded',data:{requestedMethod:expansionMethod,expandedQuery:data?.expanded_query || "",originalQuery:data?.original_query || ""},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+        patchResults(rid, (cur) => ({ ...cur, expanded: { status: "success", data, error: "" } }));
+      })
       .catch((err) => patchResults(rid, (cur) => ({ ...cur, expanded: { status: "error", data: null, error: err.message } })));
 
     requestJson("/api/clustered-search", {

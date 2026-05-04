@@ -1,5 +1,6 @@
 import sys
 import time
+import json
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -19,6 +20,21 @@ from search import SearchEngine
 
 # Global singleton for the search engine
 engine = SearchEngine()
+DEBUG_LOG_PATH = PROJECT_ROOT / ".cursor" / "debug-784b16.log"
+
+
+def _debug_log(location: str, message: str, data: dict, run_id: str, hypothesis_id: str):
+    payload = {
+        "sessionId": "784b16",
+        "runId": run_id,
+        "hypothesisId": hypothesis_id,
+        "location": location,
+        "message": message,
+        "data": data,
+        "timestamp": int(time.time() * 1000),
+    }
+    with open(DEBUG_LOG_PATH, "a", encoding="utf-8") as f:
+        f.write(json.dumps(payload) + "\n")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -95,29 +111,100 @@ class ExpandRequest(BaseModel):
 async def perform_expansion(req: ExpandRequest):
     if not req.query.strip():
         raise HTTPException(status_code=400, detail="Query cannot be empty.")
+    # #region agent log
+    _debug_log(
+        location="backend/app.py:perform_expansion:entry",
+        message="expand request received",
+        data={
+            "method": req.method,
+            "query_len": len(req.query.split()),
+            "relevant_count": len(req.relevant_doc_ids),
+            "irrelevant_count": len(req.irrelevant_doc_ids),
+            "top_k": req.top_k,
+        },
+        run_id="pre-fix",
+        hypothesis_id="H3_H4",
+    )
+    # #endregion
         
     expander = QueryExpander(engine)
     t0 = time.time()
     
     try:
+        # Tune expansion based on query length
+        query_terms = len(req.query.split())
+        # Short queries (1-2 terms) get fewer additions; longer queries can get more
+        m_neighbors = 5 if query_terms <= 3 else 10
+        top_k_docs = 50  # Local document set size for term correlation
+        
         if req.method == "rocchio":
-            # For Rocchio, we pass the explicit manual judgments
+            # Explicit Relevance Feedback: user-marked relevant/irrelevant docs
+            # #region agent log
+            _debug_log(
+                location="backend/app.py:perform_expansion:rocchio",
+                message="rocchio branch selected",
+                data={
+                    "alpha": 1.0,
+                    "beta": 0.75,
+                    "gamma": 0.25,
+                    "num_new_terms": m_neighbors,
+                },
+                run_id="pre-fix",
+                hypothesis_id="H3",
+            )
+            # #endregion
             expanded_query = expander.expand_rocchio(
-                query=req.query, 
-                relevant_doc_ids=req.relevant_doc_ids, 
-                irrelevant_doc_ids=req.irrelevant_doc_ids
+                query=req.query,
+                relevant_doc_ids=req.relevant_doc_ids,
+                irrelevant_doc_ids=req.irrelevant_doc_ids,
+                alpha=1.0,          # Weight of original query
+                beta=0.75,           # Weight of relevant docs
+                gamma=0.25,          # Weight of non-relevant docs (negative)
+                num_new_terms=5      # Max new terms to add
             )
         elif req.method == "association":
-            expanded_query = expander.expand_association(req.query, normalized=False)
+            # Pseudo-Relevance Feedback: co-occurrence in local docs
+            expanded_query = expander.expand_association(
+                query=req.query,
+                top_k_docs=top_k_docs,
+                m_neighbors=m_neighbors,
+                normalized=True,     # Use normalized correlation (helps with frequency bias)
+                max_new_terms=5      # Max new terms to add
+            )
         elif req.method == "scalar":
-            expanded_query = expander.expand_scalar(req.query)
+            # Pseudo-Relevance Feedback: cosine similarity of association vectors
+            expanded_query = expander.expand_scalar(
+                query=req.query,
+                top_k_docs=top_k_docs,
+                m_neighbors=m_neighbors,
+                max_new_terms=5      # Max new terms to add
+            )
         elif req.method == "metric":
-            expanded_query = expander.expand_metric(req.query)
+            # Pseudo-Relevance Feedback: physical word proximity in local docs
+            expanded_query = expander.expand_metric(
+                query=req.query,
+                top_k_docs=top_k_docs,
+                m_neighbors=m_neighbors,
+                max_new_terms=5      # Metric is stricter; fewer terms
+            )
         else:
             raise HTTPException(status_code=422, detail=f"Invalid expansion method: {req.method}")
             
         # Run the final search with the newly expanded query
         results = engine.search(query=expanded_query, method="bm25", top_k=req.top_k)
+        # #region agent log
+        _debug_log(
+            location="backend/app.py:perform_expansion:exit",
+            message="expand response prepared",
+            data={
+                "method": req.method,
+                "expanded_token_count": len(expanded_query.split()),
+                "result_count": len(results),
+            },
+            run_id="pre-fix",
+            hypothesis_id="H4",
+        )
+        # #endregion
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

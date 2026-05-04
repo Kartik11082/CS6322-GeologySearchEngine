@@ -1,0 +1,56 @@
+Query stem: 'groundwat'
+    Frequency sum Σf(groundwat) = 1548
+    Appears in 50 local documents
+
+    Candidate Term         Raw C(u,v)   Normalized
+    -------------------- ------------ ------------
+    homeown                    991.00     0.091454
+    pure                       395.00     0.085056
+    realiz                     921.00     0.084994
+    reliabl                    642.00     0.082946
+    surviv                     637.00     0.082300
+    fals                      2028.00     0.081880
+    ampl                       610.00     0.078811
+    salti                      356.00     0.076658
+    draw                      1379.00     0.074236
+    straw                     1602.00     0.073920
+    music                      664.00     0.071490
+    true                      2520.00     0.070779
+
+Query stem: 'aquif'
+    Frequency sum Σf(aquif) = 1532
+    Appears in 50 local documents
+
+    Candidate Term         Raw C(u,v)   Normalized
+    -------------------- ------------ ------------
+    austin                    3630.00     0.215405
+    edward                   34682.00     0.211574
+    segment                   7355.00     0.208735
+    antonio                   9520.00     0.207137
+    karst                    55194.00     0.202401
+    evaporit                  1526.00     0.199217
+    england                   3659.00     0.199032
+    sinkhol                   8762.00     0.197218
+    nitrat                    8126.00     0.196451
+    eight                     1482.00     0.193473
+    travi                     1475.00     0.192559
+    nawqa                     1474.00     0.192428
+
+Query stem: 'permeabl'
+    Frequency sum Σf(permeabl) = 226
+    Appears in 50 local documents
+
+    Candidate Term         Raw C(u,v)   Normalized
+    -------------------- ------------ ------------
+    vapour                     262.00     0.096608
+    theoret                     65.00     0.095870
+    stalagmit                  151.00     0.095449
+    gypsum                      43.00     0.095133
+    barren                      43.00     0.095133
+    tension                     43.00     0.095133
+    hypersalin                  43.00     0.095133
+    artoi                       43.00     0.095133
+    stalactit                  107.00     0.094690
+    pillar                      64.00     0.094395
+    connected                   64.00     0.094395
+    subdu                       64.00     0.094395

@@ -1,0 +1,305 @@
+================================================================================
+SCALAR CLUSTERING - DETAILED ANALYSIS
+Student: Uddesh Singh | NetID: UXS230004
+================================================================================
+
+Formula: S(u,v) = (s_u · s_v) / (|s_u| × |s_v|)
+
+
+
+
+================================================================================
+EXAMPLE QUERY 1: "pyroclastic flow danger"
+================================================================================
+
+----------------------------------------------------------------------
+(1) LOCAL DOCUMENT SET
+----------------------------------------------------------------------
+
+
+----------------------------------------------------------------------
+(2) LOCAL VOCABULARY AND STEMS
+----------------------------------------------------------------------
+
+
+----------------------------------------------------------------------
+(3) CORRELATION VALUES - Scalar S(u,v)
+----------------------------------------------------------------------
+
+Formula: S(u,v) = (s_u · s_v) / (|s_u| × |s_v|)
+Where s_u is the association vector for term u
+
+
+
+----------------------------------------
+CLUSTER SELECTION DISCUSSION:
+----------------------------------------
+
+Scalar clustering selects terms based on cosine similarity of their association
+vectors. This method captures semantic similarity - terms with similar 
+co-occurrence patterns are selected even if they don't directly co-occur.
+
+Key advantages:
+1. Captures synonyms and related concepts (e.g., "schist" similar to "gneiss")
+2. Less sensitive to document frequency variations
+3. Finds terms used in similar contexts
+
+Selection process:
+1. Build association vectors for all terms in local vocabulary
+2. Compute cosine similarity between query stem vectors and candidate vectors
+3. Select top m_neighbors for each query stem
+4. Weight by IDF and combine scores from multiple query stems
+
+
+----------------------------------------------------------------------
+(4) EXPANDED QUERY
+----------------------------------------------------------------------
+
+
+
+New terms added: ['lauea', 'pdc', 'slow', 'dromic']
+Number of expansion terms: 4
+
+----------------------------------------
+SEARCH RESULTS COMPARISON:
+----------------------------------------
+
+Original Query Results ('pyroclast flow danger'):
+     1. [99562] https://www.usgs.gov/media/images/map-shows-hazard-zone-pyroclast
+     2. [2301] https://geology.com/volcanoes/volcanic-hazards
+     3. [97406] https://www.theguardian.com/world/2025/jun/02/italy-mount-etna-eu
+     4. [99269] http://www.explorevolcanoes.com/Volcanolearningzone.html
+     5. [21231] https://www.usgs.gov/volcanoes/mono-inyo-craters/science/hazards-
+
+Expanded Query Results ('pyroclast flow danger lauea pdc slow dromic...'):
+     1. [2969] http://volcano.si.edu/volcano.cfm?vn=273030
+     2. [81755] https://volcano.si.edu/volcano.cfm?vn=273030&vtab=GeneralInfo
+     3. [99153] https://volcano.si.edu/volcano.cfm?vn=273030
+     4. [61944] https://volcano.si.edu/showreport.cfm?wvar=GVP.WVAR20230705-27303
+     5. [40579] https://volcano.si.edu/showreport.cfm?wvar=GVP.WVAR20260115-27303
+
+================================================================================
+EXAMPLE QUERY 2: "metamorphic gneiss formation"
+================================================================================
+
+----------------------------------------------------------------------
+(1) LOCAL DOCUMENT SET
+----------------------------------------------------------------------
+
+
+
+----------------------------------------------------------------------
+(2) LOCAL VOCABULARY AND STEMS
+----------------------------------------------------------------------
+
+Query: "metamorphic gneiss formation"
+Query stems (after preprocessing): ['metamorph', 'gneiss', 'format']
+
+Total unique stems in local vocabulary: 3034
+
+Local vocabulary sample (first 80 alphabetical stems):
+    abandon, abil, abl, ablat, abras, absenc, absent, absolut, abstract, abund
+    abut, aca, academi, acasta, accept, access, accompani, accord, account, accounta
+    accountforgot, accountprivaci, accountwelcom, accumul, accuraci, achiev, achmelvich, acid, acquir, acrobat
+    across, act, acta, action, activ, actual, ad, adam, add, addit
+    address, adequ, adirondack, adjac, administr, advanc, advantag, adventur, advertis, aesthet
+    affect, africa, african, aftermath, agat, age, agent, aggreg, agmatit, ago
+    agre, agricultur, agu, ai, aid, aim, air, aka, akin, al
+    alaska, alba, albania, alderley, alga, alien, align, aliv, alkalin, allegani
+
+Vocabulary statistics:
+    - Total terms in local set: 3034
+    - Alphabetic terms only: 2831
+    - Terms appearing in 2+ local docs: 3034
+
+----------------------------------------------------------------------
+(3) CORRELATION VALUES - Scalar S(u,v)
+----------------------------------------------------------------------
+
+Formula: S(u,v) = (s_u · s_v) / (|s_u| × |s_v|)
+Where s_u is the association vector for term u
+
+
+
+
+----------------------------------------
+CLUSTER SELECTION DISCUSSION:
+----------------------------------------
+
+Scalar clustering selects terms based on cosine similarity of their association
+vectors. This method captures semantic similarity - terms with similar 
+co-occurrence patterns are selected even if they don't directly co-occur.
+
+Key advantages:
+1. Captures synonyms and related concepts (e.g., "schist" similar to "gneiss")
+2. Less sensitive to document frequency variations
+3. Finds terms used in similar contexts
+
+Selection process:
+1. Build association vectors for all terms in local vocabulary
+2. Compute cosine similarity between query stem vectors and candidate vectors
+3. Select top m_neighbors for each query stem
+4. Weight by IDF and combine scores from multiple query stems
+
+
+----------------------------------------------------------------------
+(4) EXPANDED QUERY
+----------------------------------------------------------------------
+
+
+
+New terms added: ['schist', 'sedimentari', 'foliat', 'grain', 'zircon', 'textur']
+Number of expansion terms: 6
+
+----------------------------------------
+SEARCH RESULTS COMPARISON:
+----------------------------------------
+
+Original Query Results ('metamorph gneiss format'):
+     1. [98366] https://geologyistheway.com/metamorphic/gneiss
+     2. [12227] https://volcano.oregonstate.edu/metamorphic-rocks-lesson-14
+     3. [100674] https://geologyscience.com/category/rocks/metamorphic-rocks
+     4. [77129] https://www.usgs.gov/faqs/what-are-metamorphic-rocks
+     5. [30858] http://geology.utah.gov/?page_id=6619
+
+Expanded Query Results ('metamorph gneiss format schist sedimentari foliat ...'):
+     1. [100674] https://geologyscience.com/category/rocks/metamorphic-rocks
+     2. [89482] https://pressbooks.lib.vt.edu/introearthscience2e/chapter/metamor
+     3. [26547] http://geology.utah.gov/?page_id=4935
+     4. [17603] https://www.geologypage.com/2024/10/the-differences-between-sedim
+     5. [2658] https://geology.com/rocks/metamorphic-rocks.shtml
+
+================================================================================
+EXAMPLE QUERY 3: "groundwater aquifer permeability"
+================================================================================
+
+----------------------------------------------------------------------
+(1) LOCAL DOCUMENT SET
+----------------------------------------------------------------------
+
+Number of documents: 50
+Method: Top-50 BM25 results for normalized query 'groundwat aquif permeabl'
+
+Document IDs:
+    10084, 101028, 10871, 13797, 14064, 1770, 17748, 21173, 35747, 3835
+    40923, 4106, 4320, 43821, 50492, 63529, 63642, 63758, 63958, 64082
+    64390, 64918, 66537, 67335, 67892, 68947, 70165, 70768, 72027, 72668
+    73504, 74378, 74440, 74486, 75609, 75821, 76629, 81251, 81613, 82075
+    82604, 85252, 87600, 88280, 93033, 95024, 95486, 96834, 96929, 98843
+
+Sample Documents with URLs:
+    [10084] https://profession.americangeosciences.org/reports/environmental-awareness-series/geologic-maps/groundwater-alabama
+    [101028] https://www.usgs.gov/mission-areas/water-resources/science/total-water-use?qt-science_center_objects=0
+    [10871] https://profession.americangeosciences.org/reports/environmental-awareness-series/geologic-maps/groundwater-new-mexico
+    [13797] https://dnr.mo.gov/water/hows-water/state/groundwater/aquifer-information-availability
+    [14064] https://usgs.gov/water-science-school/edible-aquifer
+    [1770] https://earth-science.org.uk/search-results/entry/325
+    [17748] https://www.geologischedienst.nl/en/research/safe-liveable-delta/groundwater
+    [21173] https://www.geologypage.com/2016/05/hydraulic-fracturing.html
+
+----------------------------------------------------------------------
+(2) LOCAL VOCABULARY AND STEMS
+----------------------------------------------------------------------
+
+Query: "groundwater aquifer permeability"
+Query stems (after preprocessing): ['groundwat', 'aquif', 'permeabl']
+
+Total unique stems in local vocabulary: 2687
+
+Local vocabulary sample (first 80 alphabetical stems):
+    abandon, abil, abl, abruptli, absorb, abstract, abund, accept, access, accompani
+    accord, account, accumul, accur, achiev, acid, acknowledg, acquir, acr, across
+    act, action, activ, activist, actual, ad, adapt, add, addit, address
+    adequ, adjac, adjust, administr, adopt, adult, advanc, advers, advertis, advoc
+    advocaci, aerat, affect, africa, african, age, agenc, agent, aggreg, aggress
+    agi, ago, agreement, agricultur, agronom, aid, aim, air, al, alabama
+    align, aliv, alley, alloc, allow, alluvi, alluvium, almost, alon, along
+    alpin, alreadi, also, alter, altern, although, altitud, alway, amazon, america
+
+Vocabulary statistics:
+    - Total terms in local set: 2687
+    - Alphabetic terms only: 2527
+    - Terms appearing in 2+ local docs: 2687
+
+----------------------------------------------------------------------
+(3) CORRELATION VALUES - Scalar S(u,v)
+----------------------------------------------------------------------
+
+Formula: S(u,v) = (s_u · s_v) / (|s_u| × |s_v|)
+Where s_u is the association vector for term u
+
+
+Query stem: 'groundwat'
+    Association vector norm |s_groundwat| = 233644.1745
+    Appears in 50 local documents
+
+    Candidate Term          Dot Product      |s_v|       S(u,v)
+    -------------------- -------------- ---------- ------------
+
+Query stem: 'aquif'
+    Association vector norm |s_aquif| = 359757.0328
+    Appears in 50 local documents
+
+    Candidate Term          Dot Product      |s_v|       S(u,v)
+    -------------------- -------------- ---------- ------------
+
+Query stem: 'permeabl'
+    Association vector norm |s_permeabl| = 38441.4398
+    Appears in 50 local documents
+
+    Candidate Term          Dot Product      |s_v|       S(u,v)
+    -------------------- -------------- ---------- ------------
+
+----------------------------------------
+CLUSTER SELECTION DISCUSSION:
+----------------------------------------
+
+Scalar clustering selects terms based on cosine similarity of their association
+vectors. This method captures semantic similarity - terms with similar 
+co-occurrence patterns are selected even if they don't directly co-occur.
+
+Key advantages:
+1. Captures synonyms and related concepts (e.g., "schist" similar to "gneiss")
+2. Less sensitive to document frequency variations
+3. Finds terms used in similar contexts
+
+Selection process:
+1. Build association vectors for all terms in local vocabulary
+2. Compute cosine similarity between query stem vectors and candidate vectors
+3. Select top m_neighbors for each query stem
+4. Weight by IDF and combine scores from multiple query stems
+
+
+----------------------------------------------------------------------
+(4) EXPANDED QUERY
+----------------------------------------------------------------------
+
+Original query: "groundwater aquifer permeability"
+Normalized:     "groundwat aquif permeabl"
+Expanded query: "groundwat aquif permeabl karst edward texa contamin poros pump"
+
+New terms added: ['karst', 'edward', 'texa', 'contamin', 'poros', 'pump']
+Number of expansion terms: 6
+
+----------------------------------------
+SEARCH RESULTS COMPARISON:
+----------------------------------------
+
+Original Query Results ('groundwat aquif permeabl'):
+     1. [4106] https://water.usgs.gov/edu/earthgwaquifer.html
+     2. [74440] https://un-igrac.org/why-groundwater/groundwater-basics
+     3. [75609] https://pressbooks.openeducationalberta.ca/planetearth/chapter/wa
+     4. [3835] https://groundwater.org/awesome-aquifer
+     5. [64082] https://www.groundwater.org/awesome-aquifer
+
+Expanded Query Results ('groundwat aquif permeabl karst edward texa contami...'):
+     1. [96929] https://www.usgs.gov/mission-areas/water-resources/science/karst-
+     2. [98682] https://www.usgs.gov/media/images/karst-and-usgs-seco-sinkhole-se
+     3. [75609] https://pressbooks.openeducationalberta.ca/planetearth/chapter/wa
+     4. [85252] http://geologylearn.blogspot.com/p/blog-page_90.html
+     5. [95024] https://uhlibraries.pressbooks.pub/physicalgeologylab/chapter/lan
+
+================================================================================
+END OF SCALAR CLUSTERING ANALYSIS
+Student: Uddesh Singh | NetID: UXS230004
+================================================================================

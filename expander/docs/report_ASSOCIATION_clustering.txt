@@ -1,0 +1,98 @@
+Association clustering measures how often two terms co-occur in the
+same documents within the local document set. Higher values indicate
+stronger statistical association between terms.
+
+
+================================================================================
+EXAMPLE QUERY 1: "pyroclastic flow danger"
+================================================================================
+
+
+----------------------------------------------------------------------
+(4) EXPANDED QUERY
+----------------------------------------------------------------------
+
+
+
+New terms added: ['fingerlik', 'steampunk', 'bleick', 'kiou', 'nabonton', 'bardintzeff']
+Number of expansion terms: 6
+
+----------------------------------------
+SEARCH RESULTS COMPARISON:
+----------------------------------------
+
+Original Query Results ('pyroclast flow danger'):
+     1. [99562] https://www.usgs.gov/media/images/map-shows-hazard-zone-pyroclast
+     2. [2301] https://geology.com/volcanoes/volcanic-hazards
+     3. [97406] https://www.theguardian.com/world/2025/jun/02/italy-mount-etna-eu
+     4. [99269] http://www.explorevolcanoes.com/Volcanolearningzone.html
+     5. [21231] https://www.usgs.gov/volcanoes/mono-inyo-craters/science/hazards-
+
+Expanded Query Results ('pyroclast flow danger fingerlik steampunk bleick k...'):
+     1. [2960] https://www.usgs.gov/faqs/how-do-volcanoes-erupt?qt-news_science_
+     2. [47458] https://www.usgs.gov/faqs/how-do-volcanoes-erupt
+     3. [24390] https://www.usgs.gov/volcanoes/three-sisters/science/eruption-his
+     4. [2301] https://geology.com/volcanoes/volcanic-hazards
+     5. [2196] http://www.volcanolive.com/merapi.html
+
+================================================================================
+EXAMPLE QUERY 2: 
+================================================================================
+
+----------------------------------------------------------------------
+(4) EXPANDED QUERY
+----------------------------------------------------------------------
+
+
+
+New terms added: ['folia', 'stishovit', 'equidimension', 'barrovian', 'icpm', 'gallatin']
+Number of expansion terms: 6
+
+----------------------------------------
+SEARCH RESULTS COMPARISON:
+----------------------------------------
+
+Original Query Results ('metamorph gneiss format'):
+     1. [98366] https://geologyistheway.com/metamorphic/gneiss
+     2. [12227] https://volcano.oregonstate.edu/metamorphic-rocks-lesson-14
+     3. [100674] https://geologyscience.com/category/rocks/metamorphic-rocks
+     4. [77129] https://www.usgs.gov/faqs/what-are-metamorphic-rocks
+     5. [30858] http://geology.utah.gov/?page_id=6619
+
+Expanded Query Results ('metamorph gneiss format folia stishovit equidimens...'):
+     1. [77129] https://www.usgs.gov/faqs/what-are-metamorphic-rocks
+     2. [89482] https://pressbooks.lib.vt.edu/introearthscience2e/chapter/metamor
+     3. [20374] http://serc.carleton.edu/research_education/mt_geoheritage/sites/
+     4. [14851] https://www.geologypage.com/2019/05/regional-metamorphism.html
+     5. [100674] https://geologyscience.com/category/rocks/metamorphic-rocks
+
+================================================================================
+EXAMPLE QUERY 3: 
+================================================================================
+
+----------------------------------------------------------------------
+(4) EXPANDED QUERY
+----------------------------------------------------------------------
+
+
+
+New terms added: ['nawqa', 'ozark', 'bexar', 'evaporit', 'artoi', 'connected']
+Number of expansion terms: 6
+
+----------------------------------------
+SEARCH RESULTS COMPARISON:
+----------------------------------------
+
+Original Query Results ('groundwat aquif permeabl'):
+     1. [4106] https://water.usgs.gov/edu/earthgwaquifer.html
+     2. [74440] https://un-igrac.org/why-groundwater/groundwater-basics
+     3. [75609] https://pressbooks.openeducationalberta.ca/planetearth/chapter/wa
+     4. [3835] https://groundwater.org/awesome-aquifer
+     5. [64082] https://www.groundwater.org/awesome-aquifer
+
+Expanded Query Results ('groundwat aquif permeabl nawqa ozark bexar evapori...'):
+     1. [96929] https://www.usgs.gov/mission-areas/water-resources/science/karst-
+     2. [21476] https://www.usgs.gov/centers/lower-mississippi-gulf-water-science
+     3. [37964] https://www.usgs.gov/centers/tx-water/science/groundwater-and-spr
+     4. [40875] https://www.usgs.gov/centers/oklahoma-texas-water-science-center/
+     5. [36010] https://www.usgs.gov/centers/tx-water/science/water-quality

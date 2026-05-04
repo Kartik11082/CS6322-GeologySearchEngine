@@ -1,0 +1,62 @@
+Query stem: 'pyroclast'
+    Co-located with 94 candidate terms
+
+    Candidate Term         Σ(1/distance) Interpretation                
+    -------------------- --------------- ------------------------------
+    dead                        2.347619 Close proximity               
+    shield                      1.250000 Moderate proximity            
+    lahar                       1.200000 Moderate proximity            
+    asymmetr                    1.166667 Moderate proximity            
+    surg                        1.044532 Moderate proximity            
+    merapi                      0.904167 Distant                       
+    filter                      0.775000 Distant                       
+    slope                       0.588095 Distant                       
+    magmat                      0.500000 Distant                       
+    growth                      0.479701 Distant                       
+    spawn                       0.476190 Distant                       
+    item                        0.440476 Distant                       
+    super                       0.410370 Distant                       
+    mono                        0.380482 Distant                       
+    lamington                   0.361688 Distant                       
+
+Query stem: 'flow'
+    Co-located with 100 candidate terms
+
+    Candidate Term         Σ(1/distance) Interpretation                
+    -------------------- --------------- ------------------------------
+    lahar                       3.095556 Close proximity               
+    surg                        2.044466 Close proximity               
+    substanc                    2.000000 Moderate proximity            
+    dead                        1.853504 Moderate proximity            
+    filter                      1.558974 Moderate proximity            
+    merapi                      1.496088 Moderate proximity            
+    magmat                      1.333333 Moderate proximity            
+    avenu                       1.206667 Moderate proximity            
+    slice                       1.162037 Moderate proximity            
+    slope                       0.808741 Distant                       
+    princ                       0.741667 Distant                       
+    item                        0.700581 Distant                       
+    ball                        0.669935 Distant                       
+    melt                        0.666667 Distant                       
+    mono                        0.599739 Distant                       
+
+Query stem: 'danger'
+    Co-located with 39 candidate terms
+
+    Candidate Term         Σ(1/distance) Interpretation                
+    -------------------- --------------- ------------------------------
+    merapi                      0.877489 Distant                       
+    swallow                     0.500000 Distant                       
+    generat                     0.500000 Distant                       
+    growth                      0.406454 Distant                       
+    oregon                      0.366667 Distant                       
+    extra                       0.333333 Distant                       
+    independ                    0.309524 Distant                       
+    easili                      0.262500 Distant                       
+    outpac                      0.225490 Distant                       
+    stratovolcano               0.200000 Distant                       
+    livelihood                  0.166667 Distant                       
+    dead                        0.154262 Distant                       
+    spew                        0.138889 Distant                       
+    gravit                      0.125000 Distant                       
+    harm                        0.111111 Distant   

@@ -1,0 +1,62 @@
+Query stem: 'metamorph'
+    Co-located with 163 candidate terms
+
+    Candidate Term         Σ(1/distance) Interpretation                
+    -------------------- --------------- ------------------------------
+    sedimentari                12.564944 Very close proximity          
+    foliat                     10.309819 Very close proximity          
+    textur                      5.286384 Very close proximity          
+    breez                       3.963646 Close proximity               
+    schist                      3.961759 Close proximity               
+    grain                       2.195014 Close proximity               
+    petrolog                    2.148814 Close proximity               
+    geologysci                  1.798637 Moderate proximity            
+    iii                         1.605072 Moderate proximity            
+    minif                       1.602614 Moderate proximity            
+    jqueri                      1.557875 Moderate proximity            
+    cach                        1.490052 Moderate proximity            
+    band                        1.429252 Moderate proximity            
+    lesson                      1.366917 Moderate proximity            
+    recrystal                   1.323290 Moderate proximity            
+
+Query stem: 'gneiss'
+    Co-located with 61 candidate terms
+
+    Candidate Term         Σ(1/distance) Interpretation                
+    -------------------- --------------- ------------------------------
+    foliat                      6.158572 Very close proximity          
+    augen                       4.617177 Close proximity               
+    lewisian                    4.190909 Close proximity               
+    medium                      3.079004 Close proximity               
+    easter                      3.005814 Close proximity               
+    specimen                    2.556954 Close proximity               
+    band                        2.514448 Close proximity               
+    ross                        2.157895 Close proximity               
+    grain                       2.072615 Close proximity               
+    scotland                    2.013716 Close proximity               
+    phd                         1.588528 Moderate proximity            
+    coars                       1.364311 Moderate proximity            
+    deriv                       1.171324 Moderate proximity            
+    german                      1.115756 Moderate proximity            
+    king                        1.056816 Moderate proximity            
+
+Query stem: 'format'
+    Co-located with 62 candidate terms
+
+    Candidate Term         Σ(1/distance) Interpretation                
+    -------------------- --------------- ------------------------------
+    adirondack                  1.379056 Moderate proximity            
+    miss                        1.256318 Moderate proximity            
+    iron                        1.000000 Distant                       
+    textur                      0.942370 Distant                       
+    breez                       0.645024 Distant                       
+    geologysci                  0.633205 Distant                       
+    fabric                      0.500000 Distant                       
+    amphibolit                  0.500000 Distant                       
+    sedimentari                 0.500000 Distant                       
+    cach                        0.344216 Distant                       
+    micac                       0.333333 Distant                       
+    minif                       0.288150 Distant                       
+    schist                      0.250000 Distant                       
+    specimen                    0.250000 Distant                       
+    garnet                      0.236111 Distant                       

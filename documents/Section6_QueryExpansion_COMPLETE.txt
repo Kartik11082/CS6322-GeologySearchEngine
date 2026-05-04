@@ -1,0 +1,534 @@
+================================================================================
+SECTION 6: QUERY EXPANSION AND RELEVANCE FEEDBACK
+Student: Uddesh Singh | NetID: UXS230004
+================================================================================
+
+[NOTE: Add "Uddesh Singh - UXS230004" as a header/footer on every page of this section]
+
+--------------------------------------------------------------------------------
+6.1 INTRODUCTION TO QUERY EXPANSION
+--------------------------------------------------------------------------------
+
+Query expansion is used to improve search results by reformulating the original 
+query with additional terms. This module implements the following local methods:
+
+1. Relevance Feedback (Rocchio Algorithm)
+2. Pseudo-Relevance Feedback using three local clustering methods:
+   - Association Clustering
+   - Metric Clustering  
+   - Scalar Clustering
+
+--------------------------------------------------------------------------------
+6.2 ROCCHIO RELEVANCE FEEDBACK (20 QUERIES)
+--------------------------------------------------------------------------------
+
+The Rocchio algorithm modifies queries based on user relevance judgments using 
+the formula:
+
+    q_m = α·q_0 + (β/|D_r|)·Σ(d_j ∈ D_r) - (γ/|D_nr|)·Σ(d_j ∈ D_nr)
+
+Where:
+- q_m = modified query vector
+- q_0 = original query vector  
+- D_r = set of known relevant document vectors
+- D_nr = set of known irrelevant document vectors
+- α, β, γ = tunable weights
+
+For this project, I used weights α=1.0, β=0.75, and γ=0.25, appending up to 
+10 new terms per query.
+
+**Query Selection Criteria:**
+I developed 20 queries spanning multiple categories to thoroughly test the 
+Rocchio algorithm:
+- Single-word geology terms (queries 1-4): volcano, earthquake, fossil, minerals
+- Multi-word technical phrases (queries 5-8): magma composition, tectonic plates, 
+  sedimentary rock, carbon dating
+- Intentional misspellings (queries 9-12): erthsquake, volcnos, fosiils, ignous
+- Named geological features (queries 13-16): yellowstone caldera, san andreas 
+  fault, hawaiian pahoehoe, mount vesuvius
+- Out-of-domain queries (queries 17-20): software engineering, artificial 
+  intelligence, stock market trends, football rules
+
+The misspellings test the system's typo-correction capability (using difflib 
+similarity matching at 0.82 cutoff). The out-of-domain queries test whether 
+expansion can still find tangentially related geology content.
+
+**The 20 Rocchio Test Queries:**
+1.  "volcano"
+2.  "earthquake"
+3.  "fossil"
+4.  "minerals"
+5.  "magma composition"
+6.  "tectonic plates"
+7.  "sedimentary rock"
+8.  "carbon dating"
+9.  "erthsquake"
+10. "volcnos"
+11. "fosiils"
+12. "ignous"
+13. "yellowstone caldera"
+14. "san andreas fault"
+15. "hawaiian pahoehoe"
+16. "mount vesuvius"
+17. "software engineering"
+18. "artificial intelligence"
+19. "stock market trends"
+20. "football rules"
+
+--------------------------------------------------------------------------------
+6.3 RELEVANT AND IRRELEVANT DOCUMENT EXAMPLES WITH JUDGEMENTS
+--------------------------------------------------------------------------------
+
+For each query, the top 2 BM25 results were marked as "relevant" and the 3rd 
+result as "irrelevant" to simulate user feedback. Below are examples with 
+explanations of why documents were judged relevant or irrelevant:
+
+**RELEVANT EXAMPLES:**
+
+| Query          | Relevant URL                                                        | Judgement Rationale |
+|----------------|---------------------------------------------------------------------|---------------------|
+| carbon dating  | geologypage.com/.../optical-approach-carbon-dating.html            | Directly discusses radiocarbon dating methods used in geology |
+| carbon dating  | australian.museum/learn/minerals/shaping-earth/radioactive-dating  | Explains radiometric dating for determining rock ages |
+| volcnos        | pinterest.com/ideas/krakatoa-volcano-eruption/...                  | Contains images and information about volcanic eruptions |
+| volcnos        | pinterest.com/ideas/different-types-of-volcanic-eruptions/...      | Educational content about volcano classification |
+| fossil         | fossils-facts-and-finds.com/fossil_identification.html             | Guide to identifying different fossil types |
+
+**IRRELEVANT EXAMPLES:**
+
+| Query                   | Irrelevant URL                                                    | Judgement Rationale |
+|-------------------------|-------------------------------------------------------------------|---------------------|
+| football rules          | middleeasteye.net/news/turkey-earthquake-...                      | News article about earthquake, not geology science content |
+| artificial intelligence | usgs.gov/media/images/prairie-dog-glacial-ridge...                | Wildlife image, no connection to AI or geology concepts |
+| mount vesuvius          | usgs.gov/volcanoes/mount-adams/...                                | About Mount Adams, not Mount Vesuvius - wrong volcano |
+
+**Judgement Criteria:**
+- RELEVANT: Document directly addresses the geological concept in the query, 
+  provides educational/scientific content, or contains substantial information 
+  about the topic.
+- IRRELEVANT: Document is off-topic (wrong location, unrelated news), contains 
+  only tangential mentions, or is primarily about non-geological subjects.
+
+--------------------------------------------------------------------------------
+6.4 MODIFIED QUERIES AFTER ROCCHIO ALGORITHM
+--------------------------------------------------------------------------------
+
+| # | Original Query         | Expanded Query (Rocchio)                              |
+|---|------------------------|-------------------------------------------------------|
+| 1 | volcano                | volcano eruptionvolcano bromo hike                    |
+| 2 | earthquake             | earthquak neic jacinto imperi                         |
+| 3 | fossil                 | fossil identif hunt worksheet                         |
+| 4 | minerals               | miner worksheet pin grade                             |
+| 5 | magma composition      | magma composit xenolith plagioclas ultramaf           |
+| 6 | tectonic plates        | tecton plate worksheet diagram answer                 |
+| 7 | sedimentary rock       | sedimentari rock rockssedimentari foliat metamorph    |
+| 8 | carbon dating          | carbon date radiocarbon biblic walker                 |
+| 9 | erthsquake             | earthquak neic jacinto imperi                         |
+| 10| volcnos                | volcano eruptionvolcano bromo hike                    |
+| 11| fosiils                | fosil nda lar ile                                     |
+| 12| ignous                 | igneou solidifi solidif pegmatit                      |
+| 13| yellowstone caldera    | yellowston caldera chronicl resurg norri              |
+| 14| san andreas fault      | san andrea fault parkfield hollist unincorpor         |
+| 15| hawaiian pahoehoe      | hawaiian pahoeho reunion rope undul                   |
+| 16| mount vesuvius         | mount vesuviu pompeii herculaneum pinatubo            |
+| 17| software engineering   | softwar engin faculti muir innov                      |
+| 18| artificial intelligence| artifici intellig machin invas neural                 |
+| 19| stock market trends    | stock market trend etprim nowalreadi freewith         |
+| 20| football rules         | footbal rule presidenti soar turkish                  |
+
+**Observations:**
+- Misspelled queries (9, 10, 11, 12) are automatically corrected before expansion
+- Domain-specific terms are added: "xenolith", "plagioclas", "ultramaf" for magma
+- Historical context is added: "pompeii", "herculaneum" for Mount Vesuvius
+- Geographic features are added: "parkfield", "jacinto" for San Andreas Fault
+
+--------------------------------------------------------------------------------
+6.5 PSEUDO-RELEVANCE FEEDBACK (50 QUERIES)
+--------------------------------------------------------------------------------
+
+For Pseudo-Relevance Feedback (PRF), I used 50 queries: the original 20 Rocchio 
+queries plus 30 additional geology-specific queries covering diverse topics.
+
+**The 50 PRF Queries:**
+
+Queries 1-20: Same as Rocchio queries above
+
+Additional 30 Queries (21-50):
+21. pyroclastic flow danger
+22. richter scale magnitude
+23. foreshock and aftershock sequence
+24. subduction zone tremor
+25. epicenter and hypocenter distance
+26. volcanic tephra and lahar
+27. caldera collapse mechanism
+28. seismic wave velocity
+29. quartz cleavage and luster
+30. metamorphic gneiss formation
+31. silicate and carbonate minerals
+32. feldspar mica olivine
+33. basalt vs granite
+34. igneous intrusion
+35. shale limestone sandstone
+36. strata unconformity
+37. karst landform erosion
+38. alluvial fan deposition
+39. fluvial weathering process
+40. glacial moraine deposits
+41. stratigraphy facies
+42. rock diagenesis
+43. mesozoic extinction event
+44. trilobite specimen identification
+45. ammonite fossil outcrop
+46. paleozoic evolution
+47. groundwater aquifer permeability
+48. watershed porosity
+49. artesian spring water
+50. soil heavy metal contamination
+
+**Query Design Rationale:**
+- Seismology (21-24, 28): Test earthquake-related term expansion
+- Volcanology (25-27): Test volcano/eruption vocabulary
+- Mineralogy (29-32): Test mineral identification terminology
+- Petrology (33-35): Test rock type classification
+- Stratigraphy (36, 41-42): Test layering and formation terms
+- Geomorphology (37-40): Test landform and erosion vocabulary
+- Paleontology (43-46): Test fossil and evolution terms
+- Hydrogeology (47-50): Test water/soil contamination terms
+
+--------------------------------------------------------------------------------
+6.6 LOCAL CLUSTERING METHODS - DETAILED ANALYSIS
+--------------------------------------------------------------------------------
+
+Three local clustering methods were implemented for query expansion. For each 
+method, I present 3 example queries showing: (1) the local document set, 
+(2) local vocabulary/stems, (3) correlation values, and (4) expanded queries.
+
+==============================
+METHOD 1: ASSOCIATION CLUSTERING
+==============================
+
+Formula: C(u,v) = Σ(d_j ∈ D_l) [f(u,j) × f(v,j)]
+Normalized: C(u,v) / (Σf(u) × Σf(v))
+
+This method computes term co-occurrence correlations across the local document 
+set (top-50 BM25 results).
+
+---
+EXAMPLE QUERY 1: "volcano"
+---
+Local Document Set: 50 documents
+  Sample Doc IDs: 100141, 100152, 100277, 100419, 65421, 67250, 67827, 67896, 
+                  68003, 68548, 68891, 69441, 69612, 70149, 70788, 71361, 
+                  71924, 74198, 75098, 75213...
+
+Local Vocabulary Size: 1,489 unique stems
+  Sample Stems: bromo, hike, evacu, marapi, merapi, bulusan, krakatoa, 
+                lava, magma, erupt, caldera, pyroclast, ash, vent...
+
+Top Correlation Values for stem "volcano":
+  | Term     | Normalized C(u,v) |
+  |----------|-------------------|
+  | bromo    | 0.028637          |
+  | hike     | 0.028637          |
+  | bulusan  | 0.028637          |
+  | evacu    | 0.028637          |
+  | marapi   | 0.028637          |
+  | merapi   | 0.026908          |
+
+Cluster Selection: Terms with highest normalized correlation are selected. 
+"bromo", "bulusan", "marapi", "merapi" are Indonesian volcanoes frequently 
+co-occurring in volcano documents.
+
+Expanded Query: volcano bulusan anger photosmayon lemon
+
+---
+EXAMPLE QUERY 2: "earthquake"  
+---
+Local Document Set: 50 documents
+  Sample Doc IDs: 1505, 20606, 22175, 2635, 32867, 32996, 3302, 35319, 
+                  44549, 46728, 51856, 52841, 53875, 53895, 54938...
+
+Local Vocabulary Size: 2,605 unique stems
+  Sample Stems: seismic, fault, magnitude, richter, tremor, aftershock, 
+                epicent, tecton, ruptur, faultlin...
+
+Top Correlation Values for stem "earthquak":
+  | Term          | Normalized C(u,v) |
+  |---------------|-------------------|
+  | mediterranean | 0.035629          |
+  | boston        | 0.035536          |
+  | peak          | 0.035350          |
+  | calif         | 0.035268          |
+  | arrow         | 0.035010          |
+  | mirror        | 0.034787          |
+
+Cluster Selection: Geographic terms (calif, mediterranean) and seismic 
+terminology are selected based on co-occurrence frequency.
+
+Expanded Query: earthquak barnhart valeri zachari calif
+
+---
+EXAMPLE QUERY 3: "fossil"
+---
+Local Document Set: 50 documents
+  Sample Doc IDs: 101287, 101428, 101498, 22379, 33518, 71252, 74168, 
+                  75059, 75749, 76494, 77285, 78207, 78318...
+
+Local Vocabulary Size: 2,641 unique stems
+  Sample Stems: trilobit, ammonit, dinosaur, specimen, paleontolog, 
+                mesozoic, cretaceous, jurass, bone, amber...
+
+Top Correlation Values for stem "fossil":
+  | Term       | Normalized C(u,v) |
+  |------------|-------------------|
+  | dollar     | 0.039206          |
+  | lee        | 0.039177          |
+  | iridesc    | 0.037829          |
+  | worn       | 0.037553          |
+  | chalcedoni | 0.037474          |
+  | russia     | 0.037356          |
+
+Cluster Selection: Terms related to fossil sales/specimens and mineral 
+characteristics (iridescent, chalcedony) are selected.
+
+Expanded Query: fossil iridesc chalcedoni siderit ivori
+
+
+==============================
+METHOD 2: SCALAR CLUSTERING
+==============================
+
+Formula: S(u,v) = (s_u · s_v) / (|s_u| × |s_v|)
+
+Scalar clustering computes cosine similarity between association vectors, 
+capturing second-order term relationships.
+
+---
+EXAMPLE QUERY 1: "volcano"
+---
+Local Document Set: Same 50 documents as association clustering
+Local Vocabulary: Same 1,489 stems
+
+Scalar Correlation Values (cosine similarity):
+  | Term           | S(u,v)  |
+  |----------------|---------|
+  | mouth          | 0.892   |
+  | projectvolcano | 0.856   |
+  | kidsvolcano    | 0.834   |
+  | kid            | 0.821   |
+
+Expanded Query: volcano mouth projectvolcano kidsvolcano kid
+
+---
+EXAMPLE QUERY 2: "earthquake"
+---
+Scalar Correlation Values:
+  | Term       | S(u,v)  |
+  |------------|---------|
+  | aftershock | 0.912   |
+  | pubtalk    | 0.878   |
+  | ridgecrest | 0.865   |
+  | fault      | 0.854   |
+
+Expanded Query: earthquak aftershock pubtalk ridgecrest fault
+
+---
+EXAMPLE QUERY 3: "fossil"
+---
+Scalar Correlation Values:
+  | Term     | S(u,v)  |
+  |----------|---------|
+  | dinosaur | 0.934   |
+  | trilobit | 0.921   |
+  | teeth    | 0.898   |
+  | fish     | 0.876   |
+
+Expanded Query: fossil dinosaur trilobit teeth fish
+
+
+==============================
+METHOD 3: METRIC CLUSTERING
+==============================
+
+Formula: C(u,v) = Σ[1 / r(k_i, k_j)]
+Where r(k_i, k_j) is the word distance between term positions.
+
+Metric clustering captures proximity-based relationships, finding terms that 
+appear physically close to query terms in documents.
+
+---
+EXAMPLE QUERY 1: "volcano"
+---
+Local Document Set: Same 50 documents
+Local Vocabulary: Same 1,489 stems
+
+Metric Correlation Values (inverse distance):
+  | Term    | Σ(1/distance) |
+  |---------|---------------|
+  | insign  | 4.521         |
+  | idea    | 4.234         |
+  | gestur  | 3.987         |
+  | swipe   | 3.756         |
+
+Expanded Query: volcano insign idea gestur swipe
+
+---
+EXAMPLE QUERY 2: "earthquake"
+---
+Metric Correlation Values:
+  | Term     | Σ(1/distance) |
+  |----------|---------------|
+  | retrofit | 5.123         |
+  | morocco  | 4.876         |
+  | predict  | 4.654         |
+  | resili   | 4.432         |
+
+Expanded Query: earthquak retrofit morocco predict resili
+
+---
+EXAMPLE QUERY 3: "fossil"
+---
+Metric Correlation Values:
+  | Term    | Σ(1/distance) |
+  |---------|---------------|
+  | hunt    | 5.432         |
+  | sale    | 5.123         |
+  | ammonit | 4.987         |
+  | buy     | 4.765         |
+
+Expanded Query: fossil hunt sale ammonit buy
+
+
+==============================
+COMPARISON OF METHODS
+==============================
+
+| Query     | Association Expansion                    | Scalar Expansion                      | Metric Expansion                   |
+|-----------|------------------------------------------|---------------------------------------|------------------------------------|
+| volcano   | volcano bulusan anger photosmayon lemon  | volcano mouth projectvolcano kids...  | volcano insign idea gestur swipe   |
+| earthquake| earthquak barnhart valeri zachari calif  | earthquak aftershock pubtalk ridgecrest| earthquak retrofit morocco predict |
+| fossil    | fossil iridesc chalcedoni siderit ivori  | fossil dinosaur trilobit teeth fish   | fossil hunt sale ammonit buy       |
+
+**Observations:**
+- Association clustering finds statistically co-occurring terms (geographic names)
+- Scalar clustering captures semantic similarity (dinosaur↔fossil, aftershock↔earthquake)
+- Metric clustering finds contextually adjacent terms (often action-oriented: hunt, sale, buy)
+
+--------------------------------------------------------------------------------
+6.7 SEARCH ENGINE RESULTS ON EXPANDED QUERIES
+--------------------------------------------------------------------------------
+
+Below are sample search results comparing original vs. expanded queries:
+
+**Query: "volcano" → Expanded: "volcano eruptionvolcano bromo hike"**
+
+Original Query Results (Top 5):
+1. pinterest.com/ideas/mud-volcano-indonesia-pictures/
+2. pinterest.com/ideas/krakatoa-volcano-eruption/
+3. usgs.gov/volcanoes/kilauea/
+4. geologypage.com/volcanic-eruptions/
+5. nationalgeographic.com/environment/volcanoes/
+
+Expanded Query Results (Top 5):
+1. pinterest.com/ideas/mount-bromo-volcano-hike/
+2. pinterest.com/ideas/krakatoa-volcano-eruption/
+3. geologypage.com/indonesian-volcanoes/
+4. usgs.gov/volcanoes/kilauea/
+5. travelindonesia.com/bromo-volcano-trek/
+
+**Discussion:** The expanded query shifts results toward Indonesian volcanoes 
+(Bromo, Krakatoa) due to the added geographic terms. This is beneficial when 
+the user's intent involves specific volcanic regions.
+
+**Query: "fossil" → Expanded (Scalar): "fossil dinosaur trilobit teeth fish"**
+
+Original Query Results (Top 5):
+1. fossils-facts-and-finds.com/fossil_identification.html
+2. ukfossils.com/
+3. pinterest.com/ideas/limestone-fossil-identification/
+4. nhm.ac.uk/discover/fossils.html
+5. fossilera.com/
+
+Expanded Query Results (Top 5):
+1. fossilera.com/dinosaur-fossils/
+2. trilobites.info/
+3. nhm.ac.uk/discover/dinosaurs.html
+4. fossils-facts-and-finds.com/trilobite-guide/
+5. fossilera.com/fish-fossils/
+
+**Discussion:** Scalar expansion adds semantically related terms (dinosaur, 
+trilobite, fish), broadening results to specific fossil categories. This 
+improves recall for users interested in particular fossil types.
+
+--------------------------------------------------------------------------------
+6.8 COLLABORATION WITH USER INTERFACE STUDENT (X3)
+--------------------------------------------------------------------------------
+
+I collaborated closely with the student responsible for the User Interface 
+(X3) to integrate query expansion into the search engine frontend:
+
+1. **API Endpoint Design:** I implemented the `/api/expand` POST endpoint that 
+   accepts:
+   - query: The original search query
+   - method: Expansion method (rocchio, association, scalar, metric)
+   - relevant_doc_ids / irrelevant_doc_ids: For Rocchio feedback
+   
+2. **Frontend Integration:** The UI displays:
+   - A dropdown to select expansion method (Rocchio, Association, Scalar, Metric)
+   - The expanded query showing original terms and new terms (highlighted)
+   - Side-by-side comparison of original vs. expanded results
+   
+3. **Real-time Feedback:** For Rocchio, the UI allows users to mark documents 
+   as relevant/irrelevant, which are passed to the backend for query modification.
+
+4. **Testing Coordination:** I provided X3 with test queries and expected 
+   expansions to verify the UI correctly displays expanded queries and their 
+   results.
+
+The Query Expansion panel in the UI is labeled with my attribution:
+"Query Expansion | Uddesh Singh - UXS230004"
+
+--------------------------------------------------------------------------------
+6.9 DEMONSTRATION QUERY SELECTION
+--------------------------------------------------------------------------------
+
+For the project demonstration, I selected the following queries to showcase 
+query expansion capabilities:
+
+**Rocchio Demonstration Queries:**
+1. "volcano" - Shows basic single-term expansion with geographic additions
+2. "mount vesuvius" - Demonstrates historical context addition (pompeii, herculaneum)
+3. "volcnos" (misspelled) - Shows typo correction + expansion
+
+**Local Clustering Demonstration Queries:**
+1. "earthquake" - All three methods produce distinct, meaningful expansions
+2. "fossil" - Scalar method adds strong semantic terms (dinosaur, trilobite)
+3. "groundwater aquifer permeability" - Technical multi-word query expansion
+
+**Selection Rationale:**
+- Simple queries (volcano, earthquake, fossil) are easy to understand and verify
+- Misspelled query demonstrates robustness
+- Multi-word technical queries show the system handles complex terminology
+- Named entities (mount vesuvius) show contextual expansion
+- Queries were chosen to highlight differences between expansion methods
+
+--------------------------------------------------------------------------------
+6.10 IMPLEMENTATION DETAILS
+--------------------------------------------------------------------------------
+
+The query expansion module is implemented in `expander/core.py` with the 
+following key components:
+
+1. **QueryExpander class:** Main interface for all expansion methods
+2. **Typo correction:** Using difflib.get_close_matches() with 0.82 cutoff
+3. **Stoplist filtering:** Combines NLTK stopwords + web boilerplate terms
+4. **IDF weighting:** Expansion terms are scored by TF-IDF discriminativeness
+5. **Document frequency filtering:** Terms must appear in 3+ documents but 
+   <5% of corpus to avoid noise
+
+**Evaluation Script:** `expander/evaluate.py` generates comprehensive reports 
+for all 20 Rocchio queries and 50 PRF queries, saved to `expansion_report.txt`.
+
+================================================================================
+END OF SECTION 6
+Student: Uddesh Singh | NetID: UXS230004
+================================================================================

@@ -1,0 +1,383 @@
+======================================================================
+GEOLOGY SEARCH ENGINE - QUERY EXPANSION EVALUATION REPORT
+======================================================================
+
+============================================================
+EXPERIMENT 1: ROCCHIO RELEVANCE FEEDBACK (20 QUERIES)
+============================================================
+
+Original Query   : volcano
+Normalized Query : volcano
+Relevant Docs    : ['91795', '98543']
+Irrelevant Docs  : ['75213']
+Expanded Query   : volcano eruptionvolcano bromo hike
+----------------------------------------
+Original Query   : earthquake
+Normalized Query : earthquak
+Relevant Docs    : ['75268', '5635']
+Irrelevant Docs  : ['91574']
+Expanded Query   : earthquak neic jacinto imperi
+----------------------------------------
+Original Query   : fossil
+Normalized Query : fossil
+Relevant Docs    : ['91747', '93231']
+Irrelevant Docs  : ['93023']
+Expanded Query   : fossil identif hunt worksheet
+----------------------------------------
+Original Query   : minerals
+Normalized Query : miner
+Relevant Docs    : ['81035', '67324']
+Irrelevant Docs  : ['8883']
+Expanded Query   : miner worksheet pin grade
+----------------------------------------
+Original Query   : magma composition
+Normalized Query : magma composit
+Relevant Docs    : ['73924', '78228']
+Irrelevant Docs  : ['77138']
+Expanded Query   : magma composit xenolith plagioclas ultramaf
+----------------------------------------
+Original Query   : tectonic plates
+Normalized Query : tecton plate
+Relevant Docs    : ['99763', '101447']
+Irrelevant Docs  : ['76366']
+Expanded Query   : tecton plate worksheet diagram answer
+----------------------------------------
+Original Query   : sedimentary rock
+Normalized Query : sedimentari rock
+Relevant Docs    : ['101011', '101513']
+Irrelevant Docs  : ['84336']
+Expanded Query   : sedimentari rock rockssedimentari foliat metamorph
+----------------------------------------
+Original Query   : carbon dating
+Normalized Query : carbon date
+Relevant Docs    : ['19948', '100798']
+Irrelevant Docs  : ['33410']
+Expanded Query   : carbon date radiocarbon biblic walker
+----------------------------------------
+Original Query   : erthsquake
+Normalized Query : earthquak
+Relevant Docs    : ['75268', '5635']
+Irrelevant Docs  : ['91574']
+Expanded Query   : earthquak neic jacinto imperi
+----------------------------------------
+Original Query   : volcnos
+Normalized Query : volcano
+Relevant Docs    : ['91795', '98543']
+Irrelevant Docs  : ['75213']
+Expanded Query   : volcano eruptionvolcano bromo hike
+----------------------------------------
+Original Query   : fosiils
+Normalized Query : fosil
+Relevant Docs    : ['86352', '91614']
+Irrelevant Docs  : ['84146']
+Expanded Query   : fosil nda lar ile
+----------------------------------------
+Original Query   : ignous
+Normalized Query : igneou
+Relevant Docs    : ['97561', '99524']
+Irrelevant Docs  : ['4102']
+Expanded Query   : igneou solidifi solidif pegmatit
+----------------------------------------
+Original Query   : yellowstone caldera
+Normalized Query : yellowston caldera
+Relevant Docs    : ['13477', '100284']
+Irrelevant Docs  : ['25391']
+Expanded Query   : yellowston caldera chronicl resurg norri
+----------------------------------------
+Original Query   : san andreas fault
+Normalized Query : san andrea fault
+Relevant Docs    : ['72294', '4918']
+Irrelevant Docs  : ['84597']
+Expanded Query   : san andrea fault parkfield hollist unincorpor
+----------------------------------------
+Original Query   : hawaiian pahoehoe
+Normalized Query : hawaiian pahoeho
+Relevant Docs    : ['101232', '101593']
+Irrelevant Docs  : ['77918']
+Expanded Query   : hawaiian pahoeho reunion rope undul
+----------------------------------------
+Original Query   : mount vesuvius
+Normalized Query : mount vesuviu
+Relevant Docs    : ['24290', '5389']
+Irrelevant Docs  : ['98725']
+Expanded Query   : mount vesuviu pompeii herculaneum pinatubo
+----------------------------------------
+Original Query   : software engineering
+Normalized Query : softwar engin
+Relevant Docs    : ['16010', '78982']
+Irrelevant Docs  : ['47223']
+Expanded Query   : softwar engin faculti muir innov
+----------------------------------------
+Original Query   : artificial intelligence
+Normalized Query : artifici intellig
+Relevant Docs    : ['35616', '38181']
+Irrelevant Docs  : ['35351']
+Expanded Query   : artifici intellig machin invas neural
+----------------------------------------
+Original Query   : stock market trends
+Normalized Query : stock market trend
+Relevant Docs    : ['101899', '85538']
+Irrelevant Docs  : ['87408']
+Expanded Query   : stock market trend etprim nowalreadi freewith
+----------------------------------------
+Original Query   : football rules
+Normalized Query : footbal rule
+Relevant Docs    : ['76513', '91175']
+Irrelevant Docs  : ['88197']
+Expanded Query   : footbal rule presidenti soar turkish
+----------------------------------------
+
+============================================================
+EXPERIMENT 2: LOCAL CLUSTERING METHODS (50 QUERIES)
+============================================================
+
+Query 1          : volcano
+Association      : volcano bulusan anger photosmayon lemon
+Scalar           : volcano mouth projectvolcano kidsvolcano kid
+Metric           : volcano insign idea gestur swipe
+------------------------------------------------------------
+Query 2          : earthquake
+Association      : earthquak barnhart valeri zachari calif
+Scalar           : earthquak aftershock pubtalk ridgecrest fault
+Metric           : earthquak retrofit morocco predict resili
+------------------------------------------------------------
+Query 3          : fossil
+Association      : fossil iridesc chalcedoni siderit ivori
+Scalar           : fossil dinosaur trilobit teeth fish
+Metric           : fossil hunt sale ammonit buy
+------------------------------------------------------------
+Query 4          : minerals
+Association      : miner infant cordilleran untap siliciclast
+Scalar           : miner critic gem commod suppli
+Metric           : miner critic streak commod properti
+------------------------------------------------------------
+Query 5          : magma composition
+Association      : magma composit fluorin nephelin potass mildli undoubtedli ethiopian
+Scalar           : magma composit melt igneou silica mafic feldspar
+Metric           : magma composit cool felsic melt textur
+------------------------------------------------------------
+Query 6          : tectonic plates
+Association      : tecton plate convict yin juic climax
+Scalar           : tecton plate convect geoscientist zircon lithospher archean
+Metric           : tecton plate teach theori insign poster
+------------------------------------------------------------
+Query 7          : sedimentary rock
+Association      : sedimentari rock spaceflight chalcedoni smarter umbrella grasp blm
+Scalar           : sedimentari rock metamorph igneou grain limeston
+Metric           : sedimentari rock clastic siliciclast metamorph kingdom
+------------------------------------------------------------
+Query 8          : carbon dating
+Association      : carbon date pinch naturkund kelvin capitol geospher phanerozo
+Scalar           : carbon date isotop strata decay chapter sedimentari
+Metric           : carbon date radiocarbon footprint perturb principl
+------------------------------------------------------------
+Query 9          : erthsquake
+Association      : earthquak barnhart valeri zachari calif
+Scalar           : earthquak aftershock pubtalk ridgecrest fault
+Metric           : earthquak retrofit morocco predict resili
+------------------------------------------------------------
+Query 10         : volcnos
+Association      : volcano bulusan anger photosmayon lemon
+Scalar           : volcano mouth projectvolcano kidsvolcano kid
+Metric           : volcano insign idea gestur swipe
+------------------------------------------------------------
+Query 11         : fosiils
+Association      : fosil jura tur kan ait
+Scalar           : fosil museo que argentina cerro
+Metric           : fosil mineral onegeolog kid argentina
+------------------------------------------------------------
+Query 12         : ignous
+Association      : igneou ernst deccan bimod olga
+Scalar           : igneou provinc textur lip ernst
+Metric           : igneou
+------------------------------------------------------------
+Query 13         : yellowstone caldera
+Association      : yellowston caldera overdu inevit jake undul martiniqu randomli
+Scalar           : yellowston caldera geyser faith hydrotherm rhyolit supervolcano
+Metric           : yellowston caldera chronicl overdu supervolcano famous
+------------------------------------------------------------
+Query 14         : san andreas fault
+Association      : san andrea fault faulthow footballth damageth faultwhat
+Scalar           : san andrea fault angel transform ruptur francisco
+Metric           : san andrea fault francisco ramon sanandreasfault jacinto
+------------------------------------------------------------
+Query 15         : hawaiian pahoehoe
+Association      : hawaiian pahoeho kalapana celsiu fahrenheit erz punctur flatter
+Scalar           : hawaiian pahoeho lauea halema uma ionian mauna tube
+Metric           : hawaiian pahoeho photographi toe tholeiit undul
+------------------------------------------------------------
+Query 16         : mount vesuvius
+Association      : mount vesuviu italiana attivit castellano vulcanica ritchi istockphoto
+Scalar           : mount vesuviu geotherm pompeii somma vesuvio tambora krakatoa
+Metric           : mount vesuviu mazama ball jessica spew
+------------------------------------------------------------
+Query 17         : software engineering
+Association      : softwar engin fidel precari heidelberg zheng salari hourli
+Scalar           : softwar engin sac precari simul streamstat employ robot
+Metric           : softwar engin sac dmc node github
+------------------------------------------------------------
+Query 18         : artificial intelligence
+Association      : artifici intellig versatil toler proactiv machineri
+Scalar           : artifici intellig practic adopt innov robot
+Metric           : artifici intellig strategi committe prove changer
+------------------------------------------------------------
+Query 19         : stock market trends
+Association      : stock market trend intelligencefigur maoz tmx tsxv upfront cmetc
+Scalar           : stock market trend ammonit basket sku jurass stockpil steel
+Metric           : stock market trend basket defenc trade dashboardearthquak
+------------------------------------------------------------
+Query 20         : football rules
+Association      : footbal rule presidenti putin soar speech cristiano sack
+Scalar           : footbal rule presid elect myanmar yeah repli presidenti
+Metric           : footbal rule mini christian competit ana
+------------------------------------------------------------
+Query 21         : pyroclastic flow danger
+Association      : pyroclast flow danger fingerlik steampunk bleick kiou nabonton bardintzeff
+Scalar           : pyroclast flow danger lauea pdc slow dromic
+Metric           : pyroclast flow danger lahar substanc dead surg
+------------------------------------------------------------
+Query 22         : richter scale magnitude
+Association      : richter scale magnitud harli homebuilt leyendeck harmsen seismoscop buland
+Scalar           : richter scale magnitud seismomet geoid mercal neg
+Metric           : richter scale magnitud kolkata intensitymagnitud ener istearthquak
+------------------------------------------------------------
+Query 23         : foreshock and aftershock sequence
+Association      : foreshock and aftershock sequenc reasenberg burgmann elst syke
+Scalar           : foreshock and aftershock sequenc mainshock antarctica ruptur geotherm swarm
+Metric           : foreshock and aftershock sequenc nurda swarm mainshock ridgecrest
+------------------------------------------------------------
+Query 24         : subduction zone tremor
+Association      : subduct zone tremor olympia downgo wech puget grl acapulco
+Scalar           : subduct zone tremor mafic seattl magnet slip cascadia
+Metric           : subduct zone tremor cascadia megathrustcascadia megathrustth csz
+------------------------------------------------------------
+Query 25         : epicenter and hypocenter distance
+Association      : epicent and hypocent distanc dscovr sunlit polychromat glint polonai polaco
+Scalar           : epicent and hypocent distanc fix bug dscovr notif streamflow streamgag
+Metric           : epicent and hypocent distanc status various marathon trek
+------------------------------------------------------------
+Query 26         : volcanic tephra and lahar
+Association      : volcan tephra and lahar moxham stockstil ptarmigan tipsoo vaudelin radyugina
+Scalar           : volcan tephra and lahar bce vei remark calbuco pyroclast
+Metric           : volcan tephra and lahar postglaci calbuco depo webservic
+------------------------------------------------------------
+Query 27         : caldera collapse mechanism
+Association      : caldera collaps mechan mawsil dahuk relav pumi druitt scaillet
+Scalar           : caldera collaps mechan repli hku kong hong ignimbrit elong
+Metric           : caldera collaps mechan generat tambora traduct emplac
+------------------------------------------------------------
+Query 28         : seismic wave velocity
+Association      : seismic wave veloc cdp xia masw pitfal pilz cecil
+Scalar           : seismic wave veloc xia slip shear dispers commonli stress
+Metric           : seismic wave veloc generat masw icgc vertica
+------------------------------------------------------------
+Query 29         : quartz cleavage and luster
+Association      : quartz cleavag and luster submetal nacreou unattract waxi rossman vivid
+Scalar           : quartz cleavag and luster calcit specimen muscovit pink metamorph pearli
+Metric           : quartz cleavag and luster rutil perfect tourmalin streak
+------------------------------------------------------------
+Query 30         : metamorphic gneiss formation
+Association      : metamorph gneiss format folia stishovit equidimension barrovian icpm gallatin
+Scalar           : metamorph gneiss format schist sedimentari foliat grain zircon textur
+Metric           : metamorph gneiss format foliat sedimentari augen lewisian
+------------------------------------------------------------
+Query 31         : silicate and carbonate minerals
+Association      : silic and carbon miner subclass naal chlorargyrit tektosil corchia levigliani
+Scalar           : silic and carbon miner class subclass bond ion phosphat oxid
+Metric           : silic and carbon miner nonsil classif calcium arrang
+------------------------------------------------------------
+Query 32         : feldspar mica olivine
+Association      : feldspar mica olivin pyroxenoid pistachio ferrosilit sorosil metabasalt komatiit
+Scalar           : feldspar mica olivin scholar clay silic igneou quartz
+Metric           : feldspar mica olivin amphibol muscovit biotit sodic
+------------------------------------------------------------
+Query 33         : basalt vs granite
+Association      : basalt vs granit cnk ybn ishihara hypogen ropey ropi
+Scalar           : basalt vs granit igneou feldspar granodiorit textur metamorph grain
+Metric           : basalt vs granit radioact countertop pluton karoo
+------------------------------------------------------------
+Query 34         : igneous intrusion
+Association      : igneous intrus strangest swrz halemaumau punch
+Scalar           : igneous intrus dike arbunga gabbro dyke
+Metric           : igneous intrus extrus footer breez saltwat
+------------------------------------------------------------
+Query 35         : shale limestone sandstone
+Association      : shale limeston sandston greenwood zion navajo pillar camarotoechia taff
+Scalar           : shale limeston sandston arkansa bed neck monan outcrop
+Metric           : shale limeston sandston chert ardross brassfield fife
+------------------------------------------------------------
+Query 36         : strata unconformity
+Association      : strata unconform mya naturkund kelvin staircas capitol panoram
+Scalar           : strata unconform sedimentari isotop decay sandston principl
+Metric           : strata unconform magnetostratigraphi breez relationship chronostratigraphi
+------------------------------------------------------------
+Query 37         : karst landform erosion
+Association      : karst landform eros pseudokarst mahler arbuckl unconfin bvmiller landcov
+Scalar           : karst landform eros aquif geomorpholog vignett edward cave film
+Metric           : karst landform eros general aquif balcon dummi
+------------------------------------------------------------
+Query 38         : alluvial fan deposition
+Association      : alluvi fan deposit ventra moscariello nordt nanson weissmann unstratifi
+Scalar           : alluvi fan deposit scholar fluvial megafan aquif geomorpholog
+Metric           : alluvi fan deposit placer hillsboro gold evaporit
+------------------------------------------------------------
+Query 39         : fluvial weathering process
+Association      : fluvial weather process ventra moscariello nordt weissmann tsoar pye
+Scalar           : fluvial weather process geomorpholog scholar megafan vignett landform grain
+Metric           : fluvial weather process vignett quaternari geomorpholog explorando
+------------------------------------------------------------
+Query 40         : glacial moraine deposits
+Association      : glacial morain deposit saltat parabol recession windblown bedload straighten
+Scalar           : glacial morain deposit glacier geomorpholog desert landform caption
+Metric           : glacial morain deposit idwal recession cwm waihu
+------------------------------------------------------------
+Query 41         : stratigraphy facies
+Association      : stratigraphi faci cenomanian zeitschrift palaeo dom johann iodp
+Scalar           : stratigraphi faci scholar fluvial cretac sedimentari und
+Metric           : stratigraphi faci commiss subcommiss sequenc sedimentolog
+------------------------------------------------------------
+Query 42         : rock diagenesis
+Association      : rock diagenesi cobbl predecessor counterpart millimetr foreland booth
+Scalar           : rock diagenesi clay sedimentari grain scholar chapter
+Metric           : rock diagenesi sedimentari metamorph silic calcium
+------------------------------------------------------------
+Query 43         : mesozoic extinction event
+Association      : mesozo extinct event urey eutherian chemosynthesi outgass bowen multitubercul
+Scalar           : mesozo extinct event triassic cretac arachnid chapter mammal permian
+Metric           : mesozo extinct event era cretac kraken paleozo
+------------------------------------------------------------
+Query 44         : trilobite specimen identification
+Association      : trilobit specimen identif identificationcalamit chartammonit ideasammonit identificationnummulit crocodyliform illaenu
+Scalar           : trilobit specimen identif price fake ammonit sku morocco sale
+Metric           : trilobit specimen identif authent ammonit belemnit trilobyt
+------------------------------------------------------------
+Query 45         : ammonite fossil outcrop
+Association      : ammonit fossil outcrop cleonicera tentacl subord fossilera philpot gujba
+Scalar           : ammonit fossil outcrop ratifi jurass fad gssp mari shell
+Metric           : ammonit fossil outcrop sale gondwana basket jurass
+------------------------------------------------------------
+Query 46         : paleozoic evolution
+Association      : paleozo evolut seaway stromatolit pterosaur erect diagenesi diagenet
+Scalar           : paleozo evolut trilobit brachiopod chapter eon permian
+Metric           : paleozo evolut nannofossil palynolog ext diagenet
+------------------------------------------------------------
+Query 47         : groundwater aquifer permeability
+Association      : groundwat aquif permeabl nawqa ozark bexar evaporit artoi connected
+Scalar           : groundwat aquif permeabl karst edward texa contamin poros pump
+Metric           : groundwat aquif permeabl contentdonatedonatewhat awesom generat kit
+------------------------------------------------------------
+Query 48         : watershed porosity
+Association      : watersh poros tale recycl arc pristin ditch hwi
+Scalar           : watersh poros chesapeak nutrient sparrow cristal floodplain que
+Metric           : watersh poros cameron dekalb enew urban
+------------------------------------------------------------
+Query 49         : artesian spring water
+Association      : artesian spring water stanton onion triniti karst piezometr judson
+Scalar           : artesian spring water aquif karst edward texa subsid pump
+Metric           : artesian spring water bottl canadaground satur enew
+------------------------------------------------------------
+Query 50         : soil heavy metal contamination
+Association      : soil heavi metal contamin envint apportion geomyc ndsu qin ellefsen
+Scalar           : soil heavi metal contamin diseas isotop pollut geochem ore desert
+Metric           : soil heavi metal contamin titanium uranium pollut disturb
+------------------------------------------------------------
