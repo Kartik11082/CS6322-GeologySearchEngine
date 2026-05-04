@@ -20,21 +20,7 @@ from search import SearchEngine
 
 # Global singleton for the search engine
 engine = SearchEngine()
-DEBUG_LOG_PATH = PROJECT_ROOT / ".cursor" / "debug-784b16.log"
-
-
-def _debug_log(location: str, message: str, data: dict, run_id: str, hypothesis_id: str):
-    payload = {
-        "sessionId": "784b16",
-        "runId": run_id,
-        "hypothesisId": hypothesis_id,
-        "location": location,
-        "message": message,
-        "data": data,
-        "timestamp": int(time.time() * 1000),
-    }
-    with open(DEBUG_LOG_PATH, "a", encoding="utf-8") as f:
-        f.write(json.dumps(payload) + "\n")
+DEBUG_LOG_PATH = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -111,21 +97,7 @@ class ExpandRequest(BaseModel):
 async def perform_expansion(req: ExpandRequest):
     if not req.query.strip():
         raise HTTPException(status_code=400, detail="Query cannot be empty.")
-    # #region agent log
-    _debug_log(
-        location="backend/app.py:perform_expansion:entry",
-        message="expand request received",
-        data={
-            "method": req.method,
-            "query_len": len(req.query.split()),
-            "relevant_count": len(req.relevant_doc_ids),
-            "irrelevant_count": len(req.irrelevant_doc_ids),
-            "top_k": req.top_k,
-        },
-        run_id="pre-fix",
-        hypothesis_id="H3_H4",
-    )
-    # #endregion
+    # debug logging removed
         
     expander = QueryExpander(engine)
     t0 = time.time()
@@ -139,20 +111,7 @@ async def perform_expansion(req: ExpandRequest):
         
         if req.method == "rocchio":
             # Explicit Relevance Feedback: user-marked relevant/irrelevant docs
-            # #region agent log
-            _debug_log(
-                location="backend/app.py:perform_expansion:rocchio",
-                message="rocchio branch selected",
-                data={
-                    "alpha": 1.0,
-                    "beta": 0.75,
-                    "gamma": 0.25,
-                    "num_new_terms": m_neighbors,
-                },
-                run_id="pre-fix",
-                hypothesis_id="H3",
-            )
-            # #endregion
+            # debug logging removed
             expanded_query = expander.expand_rocchio(
                 query=req.query,
                 relevant_doc_ids=req.relevant_doc_ids,
@@ -192,19 +151,7 @@ async def perform_expansion(req: ExpandRequest):
             
         # Run the final search with the newly expanded query
         results = engine.search(query=expanded_query, method="bm25", top_k=req.top_k)
-        # #region agent log
-        _debug_log(
-            location="backend/app.py:perform_expansion:exit",
-            message="expand response prepared",
-            data={
-                "method": req.method,
-                "expanded_token_count": len(expanded_query.split()),
-                "result_count": len(results),
-            },
-            run_id="pre-fix",
-            hypothesis_id="H4",
-        )
-        # #endregion
+        # debug logging removed
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

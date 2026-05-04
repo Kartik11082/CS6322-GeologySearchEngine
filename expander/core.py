@@ -39,21 +39,7 @@ def _build_expansion_stoplist() -> set[str]:
 
 # Pre-compute stoplist and boost terms at module load
 EXPANSION_STOPLIST = _build_expansion_stoplist()
-DEBUG_LOG_PATH = PROJECT_ROOT / ".cursor" / "debug-784b16.log"
-
-
-def _debug_log(location: str, message: str, data: dict, run_id: str, hypothesis_id: str):
-    payload = {
-        "sessionId": "784b16",
-        "runId": run_id,
-        "hypothesisId": hypothesis_id,
-        "location": location,
-        "message": message,
-        "data": data,
-        "timestamp": int(time.time() * 1000),
-    }
-    with open(DEBUG_LOG_PATH, "a", encoding="utf-8") as f:
-        f.write(json.dumps(payload) + "\n")
+# debug logging removed
 
 
 class QueryExpander:
@@ -183,18 +169,7 @@ class QueryExpander:
             new_terms.append(term)
             if len(new_terms) == num_new_terms:
                 break
-        _debug_log(
-            location="expander/core.py:expand_rocchio:selection",
-            message="rocchio selected terms after filtering",
-            data={
-                "query": query,
-                "requested_new_terms": num_new_terms,
-                "selected_new_terms_count": len(new_terms),
-                "selected_new_terms": new_terms[:10],
-            },
-            run_id="post-fix",
-            hypothesis_id="H6",
-        )
+        # debug logging removed
                     
         return f"{query} {' '.join(new_terms)}"
 
