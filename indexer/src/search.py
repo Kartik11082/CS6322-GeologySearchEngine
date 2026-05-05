@@ -106,40 +106,59 @@ class SearchEngine:
             ranked = rank_tfidf(
                 query, self.inverted_index, self.doc_store, self.N, top_k
             )
-        elif method == "bm25":
-            ranked = rank_bm25(
-                query, self.inverted_index, self.doc_store, self.N, self.avg_dl, top_k
-            )
         elif method == "pagerank":
-            # use BM25 for relevance, then re-rank by combining with PageRank
-            ranked = rank_bm25(
-                query,
-                self.inverted_index,
-                self.doc_store,
-                self.N,
-                self.avg_dl,
-                top_k * 5,
-            )
-            if ranked:
-                max_bm25 = max(s for _, s in ranked) or 1.0
-                combined = []
-                for doc_id_str, bm25_score in ranked:
-                    pr_score = self.pagerank.get(int(doc_id_str), 0.0)
-                    # combine: 0.7 × normalised BM25 + 0.3 × PageRank × 1000 (scale factor)
-                    combined_score = 0.7 * (bm25_score / max_bm25) + 0.3 * (
-                        pr_score * 1000
-                    )
-                    combined.append((doc_id_str, combined_score))
-                ranked = sorted(combined, key=lambda x: x[1], reverse=True)[:top_k]
+            # Pure PageRank relevance model (filtered by term matching)
+            base_ranked = rank_tfidf(query, self.inverted_index, self.doc_store, self.N, top_k * 5)
+            pr_only = []
+            for doc_id_str, _ in base_ranked:
+                pr_score = self.pagerank.get(int(doc_id_str), 0.0)
+                pr_only.append((doc_id_str, pr_score))
+            ranked = sorted(pr_only, key=lambda x: x[1], reverse=True)[:top_k]
+            
         elif method == "hits":
+            # Pure HITS relevance model
             if self.graph is None:
                 return []
             auth_ranking, _ = hits(query, self.graph, self.inverted_index, top_k)
             ranked = [(str(doc_id), score) for doc_id, score in auth_ranking]
-        else:
-            raise ValueError(
-                f"Unknown method: {method}. Use tfidf, bm25, pagerank, or hits."
+            
+        elif method == "tfidf_pagerank":
+            # Combination: TF-IDF + PageRank
+            base_ranked = rank_tfidf(query, self.inverted_index, self.doc_store, self.N, top_k * 5)
+            if base_ranked:
+                max_tfidf = max(s for _, s in base_ranked) or 1.0
+                combined = []
+                for doc_id_str, tfidf_score in base_ranked:
+                    pr_score = self.pagerank.get(int(doc_id_str), 0.0)
+                    combined_score = 0.7 * (tfidf_score / max_tfidf) + 0.3 * (pr_score * 1000)
+                    combined.append((doc_id_str, combined_score))
+                ranked = sorted(combined, key=lambda x: x[1], reverse=True)[:top_k]
+            else:
+                ranked = []
+                
+        elif method == "tfidf_hits":
+            # Combination: TF-IDF + HITS
+            base_ranked = rank_tfidf(query, self.inverted_index, self.doc_store, self.N, top_k * 5)
+            if base_ranked and self.graph:
+                auth_ranking, _ = hits(query, self.graph, self.inverted_index, top_k * 5)
+                hits_map = {str(doc_id): score for doc_id, score in auth_ranking}
+                
+                max_tfidf = max(s for _, s in base_ranked) or 1.0
+                combined = []
+                for doc_id_str, tfidf_score in base_ranked:
+                    hits_score = hits_map.get(doc_id_str, 0.0)
+                    combined_score = 0.7 * (tfidf_score / max_tfidf) + 0.3 * hits_score
+                    combined.append((doc_id_str, combined_score))
+                ranked = sorted(combined, key=lambda x: x[1], reverse=True)[:top_k]
+            else:
+                ranked = []
+                
+        elif method == "bm25":
+            ranked = rank_bm25(
+                query, self.inverted_index, self.doc_store, self.N, self.avg_dl, top_k
             )
+        else:
+            raise ValueError(f"Unknown method: {method}")
 
         return self._format_results(ranked)
 
@@ -180,9 +199,9 @@ def main() -> None:
         "--method",
         "-m",
         type=str,
-        default="bm25",
-        choices=["tfidf", "bm25", "pagerank", "hits"],
-        help="Ranking method (default: bm25)",
+        default="tfidf",
+        choices=["tfidf", "pagerank", "hits", "tfidf_pagerank", "tfidf_hits", "bm25"],
+        help="Ranking method (default: tfidf)",
     )
     parser.add_argument("--top", "-k", type=int, default=10, help="Number of results")
     args = parser.parse_args()

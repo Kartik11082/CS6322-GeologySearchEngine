@@ -12,7 +12,6 @@ This module takes the raw crawled pages from Student 1 and makes them **searchab
   - [config.py](#configpy)
   - [loader.py](#loaderpy)
   - [preprocessor.py](#preprocessorpy)
-  - [index.py](#indexpy)
   - [relevance.py](#relevancepy)
   - [graph.py](#graphpy)
   - [search.py](#searchpy--main-entry-point)
@@ -69,7 +68,7 @@ indexer/
                                         ┌──────────────┐
                                         │  search.py    │
                                         │ unified API   │
-                                        │ (4 methods)   │
+                                        │ (5 methods)   │
                                         └──────────────┘
 ```
 
@@ -331,10 +330,11 @@ engine.load()
 
 | Method | How it works |
 |--------|-------------|
-| `"tfidf"` | Calls `rank_tfidf()` directly |
-| `"bm25"` | Calls `rank_bm25()` directly |
-| `"pagerank"` | Runs BM25 to get 5× candidates, then re-ranks with `0.7 × norm_bm25 + 0.3 × pagerank × 1000` |
-| `"hits"` | Runs HITS on the query's subgraph, returns by authority score |
+| `"tfidf"` | (Vector Space Model) Calls `rank_tfidf()` directly |
+| `"pagerank"` | Filters candidates via tfidf, then ranks them strictly by their precomputed PageRank score |
+| `"hits"` | Runs HITS on the query's subgraph, returns results purely by Authority score |
+| `"tfidf_pagerank"` | Combination: Normalizes TF-IDF score and blends it with PageRank (`0.7 × norm_tfidf + 0.3 × pagerank × 1000`) |
+| `"tfidf_hits"` | Combination: Normalizes TF-IDF score and blends it with HITS Authority score (`0.7 × norm_tfidf + 0.3 × norm_hits`) |
 
 **Return format:**
 ```python
@@ -410,16 +410,17 @@ python src/search.py -q "earthquake fault" -m bm25 -k 10
 |------|-------------|---------|
 | `--build` | Build index from scratch before searching | off |
 | `-q` / `--query` | The search query | *(required for search)* |
-| `-m` / `--method` | `tfidf`, `bm25`, `pagerank`, or `hits` | `bm25` |
+| `-m` / `--method` | `tfidf`, `pagerank`, `hits`, `tfidf_pagerank`, `tfidf_hits`, or `bm25` | `tfidf` |
 | `-k` / `--top` | Number of results to return | `10` |
 
 ### Examples
 
 ```bash
 python src/search.py -q "volcanic eruption" -m tfidf -k 5
-python src/search.py -q "sedimentary rock" -m bm25
-python src/search.py -q "mineral deposits" -m pagerank
+python src/search.py -q "sedimentary rock" -m pagerank
+python src/search.py -q "mineral deposits" -m tfidf_pagerank
 python src/search.py -q "plate tectonics" -m hits
+python src/search.py -q "earthquake fault" -m tfidf_hits
 ```
 
 ---
@@ -461,26 +462,31 @@ Now you can run blazing-fast (<0.1s) searches via API POST requests to `http://1
 
 ### Example API Requests
 
-Once the server is running, you can test it from another terminal using `curl`. Here are examples using all four underlying search methods:
+Once the server is running, you can test it from another terminal using `curl`. Here are examples using all five underlying search methods:
 
-**1. BM25 (Default method — Best overall text relevance)**
-```bash
-curl -X POST http://127.0.0.1:8000/api/search -H "Content-Type: application/json" -d "{\"query\": \"sedimentary rock\", \"method\": \"bm25\", \"top_k\": 5}"
-```
-
-**2. TF-IDF (Classic vector space model)**
+**1. TF-IDF (Vector Space Model)**
 ```bash
 curl -X POST http://127.0.0.1:8000/api/search -H "Content-Type: application/json" -d "{\"query\": \"volcanic eruption\", \"method\": \"tfidf\", \"top_k\": 5}"
 ```
 
-**3. Topic-Specific PageRank (Boosts high-quality geology pages)**
+**2. Topic-Specific PageRank (Pure Link Analysis)**
 ```bash
 curl -X POST http://127.0.0.1:8000/api/search -H "Content-Type: application/json" -d "{\"query\": \"mineral deposits\", \"method\": \"pagerank\", \"top_k\": 5}"
 ```
 
-**4. HITS (Returns authoritative pages on the topic)**
+**3. HITS (Pure Link Analysis - Authority)**
 ```bash
 curl -X POST http://127.0.0.1:8000/api/search -H "Content-Type: application/json" -d "{\"query\": \"plate tectonics\", \"method\": \"hits\", \"top_k\": 5}"
+```
+
+**4. Combination: TF-IDF + PageRank**
+```bash
+curl -X POST http://127.0.0.1:8000/api/search -H "Content-Type: application/json" -d "{\"query\": \"sedimentary rock\", \"method\": \"tfidf_pagerank\", \"top_k\": 5}"
+```
+
+**5. Combination: TF-IDF + HITS**
+```bash
+curl -X POST http://127.0.0.1:8000/api/search -H "Content-Type: application/json" -d "{\"query\": \"earthquake fault\", \"method\": \"tfidf_hits\", \"top_k\": 5}"
 ```
 
 ---
