@@ -15,7 +15,7 @@ This document outlines the API contract for the backend search service. It detai
 | Field | Type | Required | Default | Description |
 |---|---|---|---|---|
 | `query` | `string` | **Yes** | - | The query string to search for (e.g., "earthquake fault lines"). Must not be empty. |
-| `method` | `string` | No | `"bm25"` | The ranking algorithm to use. <br>Enum: `["tfidf", "bm25", "pagerank", "hits"]`. |
+| `method` | `string` | No | `"bm25"` | The ranking algorithm to use. <br>Enum: `["tfidf", "pagerank", "hits", "tfidf_pagerank", "tfidf_hits", "bm25"]`. |
 | `top_k` | `integer` | No | `10` | The number of top results to return. <br>Range: `1` to `100`. |
 
 ### Example Request Body:
@@ -100,6 +100,6 @@ If an invalid parameter is passed or an internal failure occurs, an error payloa
 ### Example Error Response:
 ```json
 {
-  "detail": "Invalid method 'neural'. Must be one of: tfidf, bm25, pagerank, hits."
+  "detail": "Invalid method 'neural'. Must be one of: tfidf, pagerank, hits, tfidf_pagerank, tfidf_hits, bm25."
 }
 ```
