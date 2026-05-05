@@ -11,7 +11,6 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import AliasChoices, BaseModel, Field
 
-
 SEARCH_ENGINE_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = SEARCH_ENGINE_ROOT.parent
 DEFAULT_BENCHMARK_PATH = (
@@ -19,7 +18,14 @@ DEFAULT_BENCHMARK_PATH = (
 )
 SERPAPI_URL = "https://serpapi.com/search"
 SEARCH_METHOD_ALIASES = {"combined": "pagerank"}
-VALID_SEARCH_METHODS = {"tfidf", "bm25", "pagerank", "hits", "combined"}
+VALID_SEARCH_METHODS = {
+    "tfidf",
+    "bm25",
+    "pagerank",
+    "hits",
+    "tfidf_pagerank",
+    "tfidf_hits",
+}
 VALID_EXTERNAL_ENGINES = {"google", "bing"}
 FALLBACK_DEMO_QUERIES = [
     {
@@ -72,7 +78,8 @@ def config(name: str, default: str) -> str:
 
 def normalize_search_method(method: str) -> str:
     normalized = method.strip().lower()
-    if normalized not in VALID_SEARCH_METHODS:
+    resolved = SEARCH_METHOD_ALIASES.get(normalized, normalized)
+    if resolved not in VALID_SEARCH_METHODS:
         raise HTTPException(
             status_code=422,
             detail=(
@@ -80,7 +87,7 @@ def normalize_search_method(method: str) -> str:
                 f"{', '.join(sorted(VALID_SEARCH_METHODS))}."
             ),
         )
-    return SEARCH_METHOD_ALIASES.get(normalized, normalized)
+    return resolved
 
 
 def parse_upstream_error(

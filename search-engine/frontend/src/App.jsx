@@ -3,10 +3,11 @@ import { startTransition, useEffect, useMemo, useRef, useState } from "react";
 const API_BASE = (import.meta.env.VITE_PROXY_API_BASE || "").replace(/\/$/, "");
 
 const MODEL_CONFIG = [
-  { key: "bm25", label: "BM25", description: "Okapi BM25 — primary lexical relevance model." },
   { key: "tfidf", label: "TF-IDF", description: "Vector-space cosine similarity baseline." },
-  { key: "pagerank", label: "PageRank", description: "BM25 blended with link-authority from the crawl graph." },
+  { key: "pagerank", label: "PageRank", description: "TF-IDF blended with link-authority from the crawl graph." },
   { key: "hits", label: "HITS", description: "Query-dependent authority scoring (Kleinberg)." },
+  { key: "tfidf_pagerank", label: "TF-IDF + PageRank", description: "Combined TF-IDF relevance and PageRank authority." },
+  { key: "tfidf_hits", label: "TF-IDF + HITS", description: "Combined TF-IDF relevance and HITS authority scoring." },
 ];
 
 const TAB_CONFIG = [
@@ -29,12 +30,22 @@ const CLUSTER_OPTIONS = [
   { value: "complete", label: "Complete" },
 ];
 
+const GEO_SOURCE_OPTIONS = [
+  { value: "tfidf", label: "TF-IDF" },
+  { value: "pagerank", label: "PageRank" },
+  { value: "hits", label: "HITS" },
+  { value: "tfidf_pagerank", label: "TF-IDF + PageRank" },
+  { value: "tfidf_hits", label: "TF-IDF + HITS" },
+  { value: "clustered", label: "Clustered" },
+  { value: "expanded", label: "Query Expansion" },
+];
+
 const TEAM = {
-  crawler:   { role: "Crawler",         name: "Zafeer Rangoonwala", netid: "zxr240004" },
-  indexer:   { role: "Indexer",         name: "Rahul Patil",        netid: "rxp240025" },
-  interface: { role: "Interface",       name: "Kartik Karkera",     netid: "KXK230091" },
-  cluster:   { role: "Clustering",      name: "Preeti Vasaikar",    netid: "pxv230036" },
-  expand:    { role: "Query Expansion", name: "Uddesh Singh",       netid: "uxs230004" },
+  crawler: { role: "Crawler", name: "Zafeer Rangoonwala", netid: "zxr240004" },
+  indexer: { role: "Indexer", name: "Rahul Patil", netid: "rxp240025" },
+  interface: { role: "Interface", name: "Kartik Karkera", netid: "KXK230091" },
+  cluster: { role: "Clustering", name: "Preeti Vasaikar", netid: "pxv230036" },
+  expand: { role: "Query Expansion", name: "Uddesh Singh", netid: "uxs230004" },
 };
 
 function PaneAttrib({ who }) {
@@ -64,7 +75,7 @@ function readInitialState() {
   const topKParam = Number(p.get("topK"));
   const initialExpansionMethod = p.get("expand") || "association";
   // #region agent log
-  fetch('http://127.0.0.1:7676/ingest/42b47de6-4aeb-471e-a7f7-2c4cc9c845e0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'784b16'},body:JSON.stringify({sessionId:'784b16',runId:'pre-fix',hypothesisId:'H1_H2',location:'search-engine/frontend/src/App.jsx:readInitialState',message:'initial expansion method parsed from URL',data:{url_expand:p.get("expand"),resolved_expand:initialExpansionMethod},timestamp:Date.now()})}).catch(()=>{});
+  fetch('http://127.0.0.1:7676/ingest/42b47de6-4aeb-471e-a7f7-2c4cc9c845e0', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '784b16' }, body: JSON.stringify({ sessionId: '784b16', runId: 'pre-fix', hypothesisId: 'H1_H2', location: 'search-engine/frontend/src/App.jsx:readInitialState', message: 'initial expansion method parsed from URL', data: { url_expand: p.get("expand"), resolved_expand: initialExpansionMethod }, timestamp: Date.now() }) }).catch(() => { });
   // #endregion
   return {
     query: p.get("q") || "",
@@ -134,14 +145,14 @@ async function buildExpandBody(query, expansionMethod, topK) {
 
   const baseline = await requestJson("/api/search", {
     method: "POST",
-    body: { query, method: "bm25", top_k: 3 },
+    body: { query, method: "tfidf", top_k: 3 },
   });
   const docs = baseline?.results || [];
   const relevant_doc_ids = docs.slice(0, 2).map((d) => String(d.doc_id));
   const irrelevant_doc_ids = docs.slice(2, 3).map((d) => String(d.doc_id));
 
   // #region agent log
-  fetch('http://127.0.0.1:7676/ingest/42b47de6-4aeb-471e-a7f7-2c4cc9c845e0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'784b16'},body:JSON.stringify({sessionId:'784b16',runId:'post-fix',hypothesisId:'H5',location:'search-engine/frontend/src/App.jsx:buildExpandBody',message:'rocchio feedback docs derived from bm25',data:{query,relevantCount:relevant_doc_ids.length,irrelevantCount:irrelevant_doc_ids.length},timestamp:Date.now()})}).catch(()=>{});
+  fetch('http://127.0.0.1:7676/ingest/42b47de6-4aeb-471e-a7f7-2c4cc9c845e0', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '784b16' }, body: JSON.stringify({ sessionId: '784b16', runId: 'post-fix', hypothesisId: 'H5', location: 'search-engine/frontend/src/App.jsx:buildExpandBody', message: 'rocchio feedback docs derived from bm25', data: { query, relevantCount: relevant_doc_ids.length, irrelevantCount: irrelevant_doc_ids.length }, timestamp: Date.now() }) }).catch(() => { });
   // #endregion
 
   return { query, method: expansionMethod, top_k: topK, relevant_doc_ids, irrelevant_doc_ids };
@@ -237,7 +248,7 @@ function TopBar({
         </form>
         <div className="controls">
           <div className="ctl">
-            <span className="ctl-lbl">Top K</span>
+            <span className="ctl-lbl">N</span>
             <div className="topk-stepper">
               <button type="button" onClick={() => setTopK((v) => Math.max(3, v - 1))}>−</button>
               <span>{topK}</span>
@@ -313,7 +324,7 @@ function ResultCard({ item, items, scoreField = "score", showClusterTag = false 
             </span>
           )}
         </div>
-        <div className="ru">{item.display_url || domainFromUrl(item.url)}</div>
+        <div className="ru">{item.url}</div>
         <a className="rt" href={item.url} target="_blank" rel="noreferrer">
           {item.title || item.url}
         </a>
@@ -321,7 +332,7 @@ function ResultCard({ item, items, scoreField = "score", showClusterTag = false 
       </div>
       <aside className="rsc">
         <span className="sclbl">Score</span>
-        <strong>{Number(item[scoreField] ?? 0).toFixed(3)}</strong>
+        <strong>{Number(item[scoreField] ?? 0)}</strong>
       </aside>
       <div className="rsbar"><div className="rsfill" style={{ width: `${width}%` }} /></div>
     </article>
@@ -560,12 +571,27 @@ function ExpandedPane({ panel, searchQuery, expansionMethod }) {
 /* ================================================================
    COMPARE PANE (GeoSearch vs Google vs Bing)
    ================================================================ */
+function getGeoPanel(results, source) {
+  if (source === "clustered") return results.clustered;
+  if (source === "expanded") return results.expanded;
+  return results.models[source] ?? results.models.bm25;
+}
+
+function getGeoItems(data, source) {
+  if (source === "clustered") return data?.reranked || [];
+  return data?.results || [];
+}
+
 function ComparePane({ results }) {
-  const geo = results.models.bm25;
+  const [geoSource, setGeoSource] = useState("tfidf");
+
+  const geo = getGeoPanel(results, geoSource);
+  const geoItems = getGeoItems(geo.data, geoSource);
+  const geoLabel = GEO_SOURCE_OPTIONS.find((o) => o.value === geoSource)?.label ?? "GeoSearch";
+
   const google = results.google;
   const bing = results.bing;
 
-  const geoItems = geo.data?.results || [];
   const googleItems = google.data?.results || [];
   const bingItems = bing.data?.results || [];
 
@@ -575,8 +601,6 @@ function ComparePane({ results }) {
 
   const geoVsGoogle = geoItems.filter((r) => googleDomains.has(domainFromUrl(r.url))).length;
   const geoVsBing = geoItems.filter((r) => bingDomains.has(domainFromUrl(r.url))).length;
-
-  const maxRows = Math.max(geoItems.length, googleItems.length, bingItems.length, 1);
 
   function overlapTags(url) {
     const d = domainFromUrl(url);
@@ -607,16 +631,20 @@ function ComparePane({ results }) {
     const status = getStatus(geo, "Run a search to see results.", 5);
     return (
       <div className="cmp-col">
-        <ColHeader label="GeoSearch" cls="cmp-geo" count={geoItems.length}
+        <ColHeader
+          label={`GeoSearch · ${geoLabel}`}
+          cls="cmp-geo"
+          count={geoItems.length}
           overlap={geoVsGoogle + geoVsBing > 0 ? Math.max(geoVsGoogle, geoVsBing) : null}
-          overlapLabel="web engines" />
+          overlapLabel="web engines"
+        />
         {status || geoItems.map((item) => {
           const tags = overlapTags(item.url);
           return (
             <div key={item.url} className="cmp-row">
-              <span className="cmp-rank">{item.rank}</span>
+              <span className="cmp-rank">{item.rank || item.position}</span>
               <div className="cmp-body">
-                <div className="cmp-domain">{item.display_url || domainFromUrl(item.url)}</div>
+                <div className="cmp-domain">{item.url}</div>
                 <a className="cmp-title" href={item.url} target="_blank" rel="noreferrer">
                   {item.title || item.url}
                 </a>
@@ -648,7 +676,7 @@ function ComparePane({ results }) {
             <div key={item.url} className={`cmp-row${inGeo ? " cmp-row-shared" : ""}`}>
               <span className="cmp-rank">{item.rank || item.position}</span>
               <div className="cmp-body">
-                <div className="cmp-domain">{item.display_url || domainFromUrl(item.url)}</div>
+                <div className="cmp-domain">{item.url}</div>
                 <a className="cmp-title" href={item.url} target="_blank" rel="noreferrer">
                   {item.title || item.url}
                 </a>
@@ -667,9 +695,19 @@ function ComparePane({ results }) {
       <div className="pane-intro">
         <h2>
           Compare Engines
-          <span className="info-tip" aria-label="GeoSearch BM25 results alongside live Google and Bing results for the same query. Shared domains are highlighted across columns.">?</span>
+          <span className="info-tip" aria-label="GeoSearch results alongside live Google and Bing results. Switch the GeoSearch source to compare any relevance model, clustered, or expanded results.">?</span>
         </h2>
         <PaneAttrib who="interface" />
+      </div>
+      <div className="cmp-controls">
+        <label className="ctl">
+          <span className="ctl-lbl">GeoSearch source</span>
+          <select value={geoSource} onChange={(e) => setGeoSource(e.target.value)}>
+            {GEO_SOURCE_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </label>
       </div>
       <div className="cmp-grid">
         <GeoCol />
@@ -875,7 +913,7 @@ export default function App() {
   const [expansionMethod, setExpansionMethod] = useState(initial.expansionMethod);
   const [clusterMethod, setClusterMethod] = useState(initial.clusterMethod);
   const [activeTab, setActiveTab] = useState(initial.tab);
-  const [activeModel, setActiveModel] = useState("bm25");
+  const [activeModel, setActiveModel] = useState("tfidf");
   const [activeClusterId, setActiveClusterId] = useState(null);
   const [results, setResults] = useState(createInitialResults);
   const [lastSearch, setLastSearch] = useState(initial.query);
@@ -884,7 +922,7 @@ export default function App() {
   const hasSearched = !!lastSearch;
 
   const tabCounts = useMemo(() => ({
-    models: results.models[activeModel]?.data?.results?.length,
+    models: results.models[activeModel ?? "tfidf"]?.data?.results?.length,
     clustered: results.clustered.data?.reranked?.length,
     expanded: results.expanded.data?.results?.length,
     compare: results.google.status === "success" || results.bing.status === "success" ? 3 : undefined,
@@ -902,7 +940,7 @@ export default function App() {
     if (!lastSearch) return;
     const rid = requestIdRef.current;
     // #region agent log
-    fetch('http://127.0.0.1:7676/ingest/42b47de6-4aeb-471e-a7f7-2c4cc9c845e0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'784b16'},body:JSON.stringify({sessionId:'784b16',runId:'pre-fix',hypothesisId:'H2_H3',location:'search-engine/frontend/src/App.jsx:useEffect(expansionMethod)',message:'expansion rerun triggered',data:{expansionMethod,lastSearch,topK},timestamp:Date.now()})}).catch(()=>{});
+    fetch('http://127.0.0.1:7676/ingest/42b47de6-4aeb-471e-a7f7-2c4cc9c845e0', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '784b16' }, body: JSON.stringify({ sessionId: '784b16', runId: 'pre-fix', hypothesisId: 'H2_H3', location: 'search-engine/frontend/src/App.jsx:useEffect(expansionMethod)', message: 'expansion rerun triggered', data: { expansionMethod, lastSearch, topK }, timestamp: Date.now() }) }).catch(() => { });
     // #endregion
     syncUrl({ query: lastSearch, topK, expansionMethod, clusterMethod, tab: activeTab, view });
     startTransition(() =>
@@ -995,7 +1033,7 @@ export default function App() {
       .then((expandBody) => requestJson("/api/expand", { method: "POST", body: expandBody }))
       .then((data) => {
         // #region agent log
-        fetch('http://127.0.0.1:7676/ingest/42b47de6-4aeb-471e-a7f7-2c4cc9c845e0',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'784b16'},body:JSON.stringify({sessionId:'784b16',runId:'post-fix',hypothesisId:'H3_H4',location:'search-engine/frontend/src/App.jsx:runSearch:expand_success',message:'expand request succeeded',data:{requestedMethod:expansionMethod,expandedQuery:data?.expanded_query || "",originalQuery:data?.original_query || ""},timestamp:Date.now()})}).catch(()=>{});
+        fetch('http://127.0.0.1:7676/ingest/42b47de6-4aeb-471e-a7f7-2c4cc9c845e0', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '784b16' }, body: JSON.stringify({ sessionId: '784b16', runId: 'post-fix', hypothesisId: 'H3_H4', location: 'search-engine/frontend/src/App.jsx:runSearch:expand_success', message: 'expand request succeeded', data: { requestedMethod: expansionMethod, expandedQuery: data?.expanded_query || "", originalQuery: data?.original_query || "" }, timestamp: Date.now() }) }).catch(() => { });
         // #endregion
         patchResults(rid, (cur) => ({ ...cur, expanded: { status: "success", data, error: "" } }));
       })
