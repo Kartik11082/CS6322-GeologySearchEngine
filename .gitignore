@@ -68,3 +68,5 @@ CLAUDE.md
 DesignLanguage.md
 test_app.py
 report/EXPERIMENTS.md
+
+.cursor/*
