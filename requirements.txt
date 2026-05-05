@@ -1,6 +1,10 @@
 nltk>=3.9.0
 numpy>=1.26.0
 PyStemmer>=2.2.0
+spacy>=3.7.0
 fastapi>=0.110.0
 pydantic>=2.7.0
 uvicorn>=0.29.0
+
+# Optional but recommended for morphological lemmas in expanded queries:
+#   python -m spacy download en_core_web_sm

@@ -15,7 +15,7 @@ This document outlines the API contract for the Query Expansion and Relevance Fe
 | Field | Type | Required | Default | Description |
 |---|---|---|---|---|
 | `query` | `string` | **Yes** | - | The initial query string to expand (e.g., "volcanic eruption"). Must not be empty. |
-| `method` | `string` | No | `"rocchio"` | The query expansion algorithm to use. <br>Enum: `["rocchio", "association", "scalar", "metric"]`. |
+| `method` | `string` | No | `"association"` | The query expansion algorithm to use. <br>Enum: `["rocchio", "association", "scalar", "metric"]`. |
 | `top_k` | `integer` | No | `10` | The number of top results to return for the *final* expanded search. |
 | `relevant_doc_ids` | `array of strings` | No | `[]` | Used **only** when `method` is `"rocchio"`. A list of document IDs the user explicitly marked as relevant. |
 | `irrelevant_doc_ids` | `array of strings` | No | `[]` | Used **only** when `method` is `"rocchio"`. A list of document IDs the user explicitly marked as non-relevant. |

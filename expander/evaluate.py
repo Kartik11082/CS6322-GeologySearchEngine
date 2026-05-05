@@ -1,3 +1,9 @@
+"""Expansion evaluation script.
+
+Run with spaCy available (morphological lemmas in reports), e.g.::
+
+    conda run -n nlp python expander/evaluate.py
+"""
 import sys
 from pathlib import Path
 

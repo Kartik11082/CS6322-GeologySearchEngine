@@ -1,8 +1,8 @@
 import sys
 import time
-import json
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Literal
 
 # Add indexer/src to python path so we can import SearchEngine
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -20,20 +20,21 @@ from search import SearchEngine
 
 # Global singleton for the search engine
 engine = SearchEngine()
+query_expander: QueryExpander | None = None
 DEBUG_LOG_PATH = None
+
+
+def _engine_ready() -> bool:
+    return bool(getattr(engine, "inverted_index", None)) and getattr(engine, "N", 0) > 0
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global query_expander
     print("Loading search engine (this may take ~5-15 seconds)...")
-    try:
-        engine.load()
-        print("Engine loaded successfully! Ready for blazing fast searches.")
-    except Exception as e:
-        print(f"Error loading index: {e}")
-        print(
-            "Please ensure you have built the index first using: python indexer/src/search.py --build"
-        )
+    engine.load()
+    print("Engine loaded successfully! Ready for blazing fast searches.")
+    query_expander = QueryExpander(engine)
     yield
     print("Shutting down engine...")
 
@@ -68,6 +69,12 @@ class SearchRequest(BaseModel):
 
 @app.post("/api/search")
 async def perform_search(req: SearchRequest):
+    if not _engine_ready():
+        raise HTTPException(
+            status_code=503,
+            detail="Search engine index is not loaded. Build and load the index first.",
+        )
+
     if not req.query.strip():
         raise HTTPException(status_code=400, detail="Query string cannot be empty.")
 
@@ -103,12 +110,16 @@ async def perform_search(req: SearchRequest):
     }
 
 
+ExpansionMethod = Literal["rocchio", "association", "scalar", "metric"]
+
+
 class ExpandRequest(BaseModel):
     query: str = Field(..., description="The query string to expand.")
-    method: str = Field(
-        "rocchio", description="Expansion method: rocchio, association, scalar, metric"
+    method: ExpansionMethod = Field(
+        "association",
+        description="Expansion method: rocchio, association, scalar, metric.",
     )
-    top_k: int = Field(10, description="Number of results for the final search.")
+    top_k: int = Field(10, ge=1, le=100, description="Number of results for the final search.")
     relevant_doc_ids: list[str] = Field(
         default_factory=list, description="For Rocchio: IDs of relevant docs."
     )
@@ -119,66 +130,67 @@ class ExpandRequest(BaseModel):
 
 @app.post("/api/expand")
 async def perform_expansion(req: ExpandRequest):
+    if not _engine_ready() or query_expander is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Search engine index is not loaded. Build and load the index first.",
+        )
+
     if not req.query.strip():
         raise HTTPException(status_code=400, detail="Query cannot be empty.")
-    # debug logging removed
 
-    expander = QueryExpander(engine)
+    expander = query_expander
     t0 = time.time()
 
     try:
-        # Tune expansion based on query length
         query_terms = len(req.query.split())
-        # Short queries (1-2 terms) get fewer additions; longer queries can get more
         m_neighbors = 5 if query_terms <= 3 else 10
-        top_k_docs = 50  # Local document set size for term correlation
+        top_k_docs = 50
 
         if req.method == "rocchio":
-            # Explicit Relevance Feedback: user-marked relevant/irrelevant docs
-            # debug logging removed
             expanded_query = expander.expand_rocchio(
                 query=req.query,
                 relevant_doc_ids=req.relevant_doc_ids,
                 irrelevant_doc_ids=req.irrelevant_doc_ids,
-                alpha=1.0,  # Weight of original query
-                beta=0.75,  # Weight of relevant docs
-                gamma=0.25,  # Weight of non-relevant docs (negative)
-                num_new_terms=5,  # Max new terms to add
+                alpha=1.0,
+                beta=0.75,
+                gamma=0.25,
+                num_new_terms=10,
             )
         elif req.method == "association":
-            # Pseudo-Relevance Feedback: co-occurrence in local docs
             expanded_query = expander.expand_association(
                 query=req.query,
                 top_k_docs=top_k_docs,
                 m_neighbors=m_neighbors,
-                normalized=True,  # Use normalized correlation (helps with frequency bias)
-                max_new_terms=5,  # Max new terms to add
+                normalized=True,
+                max_new_terms=5,
             )
         elif req.method == "scalar":
-            # Pseudo-Relevance Feedback: cosine similarity of association vectors
             expanded_query = expander.expand_scalar(
                 query=req.query,
                 top_k_docs=top_k_docs,
                 m_neighbors=m_neighbors,
-                max_new_terms=5,  # Max new terms to add
+                max_new_terms=5,
             )
         elif req.method == "metric":
-            # Pseudo-Relevance Feedback: physical word proximity in local docs
             expanded_query = expander.expand_metric(
                 query=req.query,
                 top_k_docs=top_k_docs,
                 m_neighbors=m_neighbors,
-                max_new_terms=5,  # Metric is stricter; fewer terms
+                max_new_terms=5,
             )
         else:
             raise HTTPException(
-                status_code=422, detail=f"Invalid expansion method: {req.method}"
+                status_code=422,
+                detail=f"Invalid expansion method: {req.method}",
             )
 
-        # Run the final search with the newly expanded query
-        results = engine.search(query=expanded_query, method="bm25", top_k=req.top_k)
-        # debug logging removed
+        results = engine.search(
+            query=expanded_query, method="bm25", top_k=req.top_k
+        )
 
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

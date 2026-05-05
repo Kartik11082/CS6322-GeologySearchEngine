@@ -1,16 +1,27 @@
+"""Query expansion module.
+
+Queries use Porter stems internally (same as the inverted index). Expansion *outputs*
+can surface morphological lemmas via spaCy for readability; BM25 still re-stems at search time.
+
+Optional: install spaCy model for lemmas::
+
+    python -m spacy download en_core_web_sm
+"""
+
 import sys
 import math
-import json
-import time
+import warnings
 import difflib
 from pathlib import Path
-from collections import defaultdict
+from collections import Counter, defaultdict
 
 # Add indexer src to path so we can use Student 2's preprocessor
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "indexer" / "src"))
 
 from preprocessor import preprocess, tokenize
+
+from scalar_association_math import association_cosine_doc_frequency
 
 # Build expansion stoplist from NLTK + domain-specific terms
 def _build_expansion_stoplist() -> set[str]:
@@ -42,10 +53,79 @@ EXPANSION_STOPLIST = _build_expansion_stoplist()
 # debug logging removed
 
 
+class LemmaResolver:
+    """
+    Map Porter index stems to spaCy morphological lemmas for display-only expanded queries.
+
+    If spaCy / en_core_web_sm is unavailable, ``stem_to_lemma`` returns the stem unchanged.
+    """
+
+    _missing_model_warned = False
+
+    def __init__(self, search_engine) -> None:
+        self._stem_to_surface: dict[str, str] = self._build_stem_to_surface(search_engine)
+        self._cache: dict[str, str] = {}
+        self._nlp = None
+        self._load_failed = False
+
+    def _build_stem_to_surface(self, engine) -> dict[str, str]:
+        stem_counts: dict[str, Counter] = defaultdict(Counter)
+        for doc in engine.doc_store.values():
+            preview = doc.get("text_preview", "") or ""
+            for tok in tokenize(preview):
+                stems = preprocess(tok)
+                if stems:
+                    stem_counts[stems[0]][tok] += 1
+        return {s: c.most_common(1)[0][0] for s, c in stem_counts.items()}
+
+    def _ensure_nlp(self) -> None:
+        if self._nlp is not None or self._load_failed:
+            return
+        try:
+            import spacy
+
+            self._nlp = spacy.load("en_core_web_sm", disable=["parser", "ner"])
+        except Exception:
+            self._load_failed = True
+            if not LemmaResolver._missing_model_warned:
+                warnings.warn(
+                    "spaCy model 'en_core_web_sm' not available; expanded queries use Porter stems. "
+                    "Install: pip install spacy && python -m spacy download en_core_web_sm",
+                    UserWarning,
+                    stacklevel=3,
+                )
+                LemmaResolver._missing_model_warned = True
+
+    def stem_to_lemma(self, stem: str) -> str:
+        """Return a morphological lemma for a Porter stem; fallback to stem if unavailable."""
+        if stem in self._cache:
+            return self._cache[stem]
+
+        surface = self._stem_to_surface.get(stem, stem)
+        self._ensure_nlp()
+        if self._nlp is None:
+            self._cache[stem] = stem
+            return stem
+
+        doc = self._nlp(surface)
+        if not doc:
+            self._cache[stem] = stem
+            return stem
+
+        lemma = doc[0].lemma_.lower().strip()
+        if not lemma or not lemma.isalpha():
+            self._cache[stem] = stem
+            return stem
+
+        self._cache[stem] = lemma
+        return lemma
+
+
 class QueryExpander:
     def __init__(self, search_engine):
         self.engine = search_engine
         self._autocorrect_vocab = self._build_autocorrect_vocab()
+        self._lemma = LemmaResolver(search_engine)
 
     def _build_autocorrect_vocab(self) -> list[str]:
         """Build compact vocabulary used for typo correction."""
@@ -170,8 +250,9 @@ class QueryExpander:
             if len(new_terms) == num_new_terms:
                 break
         # debug logging removed
-                    
-        return f"{query} {' '.join(new_terms)}"
+
+        lemma_terms = [self._lemma.stem_to_lemma(t) for t in new_terms]
+        return f"{query} {' '.join(lemma_terms)}"
 
     # =====================================================================
     #  HELPERS FOR LOCAL CLUSTERING (QE Local Strategies)
@@ -224,7 +305,17 @@ class QueryExpander:
 
         if not new_terms:
             return query
-        return " ".join(original_tokens + new_terms)
+
+        lemma_new: list[str] = []
+        seen_lemma: set[str] = set()
+        for stem_term in new_terms:
+            lm = self._lemma.stem_to_lemma(stem_term)
+            key = lm.lower()
+            if key in seen_lemma:
+                continue
+            seen_lemma.add(key)
+            lemma_new.append(lm)
+        return " ".join(original_tokens + lemma_new)
 
     # =====================================================================
     #  2. ASSOCIATION CLUSTERS
@@ -294,6 +385,20 @@ class QueryExpander:
     # =====================================================================
     #  3. SCALAR CLUSTERS
     # =====================================================================
+    def association_cosine_uv(
+        self,
+        u: str,
+        v: str,
+        local_doc_ids: set[str],
+        local_tf,
+    ) -> float:
+        """See module-level association_cosine_doc_frequency; thin wrapper."""
+        if u not in local_tf or v not in local_tf:
+            return 0.0
+        return association_cosine_doc_frequency(
+            local_tf[u], local_tf[v], local_doc_ids
+        )
+
     def expand_scalar(
         self,
         query: str,
@@ -302,66 +407,48 @@ class QueryExpander:
         max_new_terms: int = 6,
     ) -> str:
         """
-        Cosine similarity of association vectors.
-        Formula: S(u,v) = (s_u * s_v) / (|s_u| * |s_v|)
+        Cosine similarity of association vectors (document-frequency on D_l).
+        Formula: S(u,v) = (s_u · s_v) / (|s_u| × |s_v|).
         """
         query = self._normalize_query_for_expansion(query)
         local_doc_ids = self._get_local_doc_set(query, top_k_docs)
-        if not local_doc_ids: return query
-        
+        if not local_doc_ids:
+            return query
+
         local_tf = self._get_local_term_frequencies(local_doc_ids)
         query_stems = preprocess(query)
         query_stem_set = set(query_stems)
         query_len = len(query_stems)
-        
-        # Pre-compute the unnormalized association matrix (just what we need)
-        # C[u][v] = association between u and v
-        C = defaultdict(lambda: defaultdict(float))
         terms = list(local_tf.keys())
-        
-        for u in query_stems:
-            if u not in local_tf: continue
-            for v in terms:
-                C[u][v] = sum(local_tf[u].get(d, 0) * local_tf[v].get(d, 0) for d in local_doc_ids)
-                
-        for v in terms: # Need full vector for candidates to compute their norms
-             for x in terms:
-                  if v == x:
-                      C[v][x] = sum(local_tf[v].get(d, 0) * local_tf[x].get(d, 0) for d in local_doc_ids)
 
         candidate_scores = defaultdict(float)
 
         for q_term in query_stems:
-            if q_term not in local_tf: continue
-            
-            # Vector s_u is C[q_term]
-            norm_u = math.sqrt(sum(val**2 for val in C[q_term].values()))
-            if norm_u == 0: continue
-            
+            if q_term not in local_tf:
+                continue
             correlations = defaultdict(float)
             for v_term in terms:
-                if not self._is_candidate_term(v_term, query_stem_set, query_len=query_len):
+                if not self._is_candidate_term(
+                    v_term, query_stem_set, query_len=query_len
+                ):
                     continue
-                
-                # Compute dot product and norms (approximated for efficiency)
-                dot_product = sum(C[q_term].get(x, 0) * C[v_term].get(x, 0) for x in terms if C[q_term].get(x, 0) > 0)
-                norm_v = math.sqrt(sum(local_tf[v_term].get(d, 0)**2 for d in local_doc_ids)) # Rough proxy to save memory
-                
-                if dot_product > 0 and norm_v > 0:
-                    correlations[v_term] = dot_product / (norm_u * norm_v)
+                s_uv = self.association_cosine_uv(
+                    q_term, v_term, local_doc_ids, local_tf
+                )
+                if s_uv > 0:
+                    correlations[v_term] = s_uv
 
-            # Apply IDF + domain boosting
             scored_neighbors = [
                 (term, self._score_expansion_term(term, score, query_stem_set))
                 for term, score in correlations.items()
             ]
-            
-            top_neighbors = sorted(scored_neighbors, key=lambda x: x[1], reverse=True)[:m_neighbors]
+
+            top_neighbors = sorted(
+                scored_neighbors, key=lambda x: x[1], reverse=True
+            )[:m_neighbors]
             for neighbor, score in top_neighbors:
                 candidate_scores[neighbor] = max(candidate_scores[neighbor], score)
 
-        # Borrow hybrid-style rank fusion intuition: terms supported by multiple
-        # query terms are more reliable than one-off neighbors.
         return self._finalize_expansion(
             query=query,
             query_stems=query_stem_set,
