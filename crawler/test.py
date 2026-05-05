@@ -2,7 +2,7 @@ import json
 from collections import Counter
 from urllib.parse import urlparse
 
-with open("../crawler_v2/output/pages.jsonl", "r", encoding="utf-8") as f:
+with open("../crawled_data/pages.jsonl", "r", encoding="utf-8") as f:
     data = [json.loads(line) for line in f]
 
 domains = Counter(urlparse(p["url"]).netloc for p in data)

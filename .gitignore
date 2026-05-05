@@ -70,3 +70,11 @@ test_app.py
 report/EXPERIMENTS.md
 
 .cursor/*
+crawler/lib/bindings/utils.js
+crawler/test.py
+crawler/lib/tom-select/tom-select.complete.min.js
+crawler/lib/tom-select/tom-select.css
+crawler/lib/vis-9.1.2/vis-network.css
+crawler/lib/vis-9.1.2/vis-network.min.js
+crawler/test.py
+crawler/graph.html
