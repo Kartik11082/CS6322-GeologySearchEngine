@@ -602,17 +602,6 @@ input, select {
   margin-bottom: 6px;
 }
 
-.rmeta .badge {
-  font-size: 12px;
-  font-weight: 500;
-  padding: 2px 8px;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  letter-spacing: 0.02em;
-}
-.rmeta .str { background: #ecfdf5; color: var(--success); border-color: #d1fae5; }
-.rmeta .mod { background: #fffbeb; color: var(--warning); border-color: #fef3c7; }
-.rmeta .wek { background: var(--surface-2); color: var(--text-2); border-color: var(--border); }
 
 .rmeta .ctag {
   font-size: 12px;

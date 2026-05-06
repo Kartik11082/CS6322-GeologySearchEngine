@@ -114,12 +114,6 @@ function domainFromUrl(url) {
   catch { return url; }
 }
 
-function matchStrength(item) {
-  const v = Number(item.score ?? item.baseline_score ?? 0);
-  if (v >= 0.7) return { label: "Strong", cls: "str" };
-  if (v >= 0.3) return { label: "Moderate", cls: "mod" };
-  return { label: "Weak", cls: "wek" };
-}
 
 async function requestJson(path, { method = "GET", body } = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
@@ -309,7 +303,6 @@ function TabBar({ activeTab, setActiveTab, counts }) {
    ================================================================ */
 function ResultCard({ item, items, scoreField = "score", showClusterTag = false }) {
   const width = scoreWidth(Number(item[scoreField] ?? 0), items, scoreField);
-  const strength = matchStrength(item);
   const rankDelta = Number(item.rank_delta ?? 0);
 
   return (
@@ -317,7 +310,6 @@ function ResultCard({ item, items, scoreField = "score", showClusterTag = false 
       <div className="rnk">{item.rank || item.position}</div>
       <div className="rc">
         <div className="rmeta">
-          <span className={`badge ${strength.cls}`}>{strength.label}</span>
           {showClusterTag && item.cluster_name && (
             <span className="ctag">{item.cluster_name}</span>
           )}
