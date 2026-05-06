@@ -101,7 +101,7 @@ function syncUrl({ query, topK, expansionMethod, clusterMethod, tab, view }) {
 function scoreWidth(value, items, field = "score") {
   if (!items?.length || typeof value !== "number" || Number.isNaN(value)) return 0;
   const vals = items.map((it) => Number(it[field] ?? 0)).filter(Number.isFinite);
-  const max = Math.max(...vals, 1);
+  const max = Math.max(...vals) || 1;
   return Math.max(6, Math.min(100, (value / max) * 100));
 }
 
