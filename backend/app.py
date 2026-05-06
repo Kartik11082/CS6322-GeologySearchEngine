@@ -148,8 +148,8 @@ async def perform_expansion(req: ExpandRequest):
 
     try:
         query_terms = len(req.query.split())
-        m_neighbors = 5 if query_terms <= 3 else 10
-        top_k_docs = 50
+        m_neighbors = 2 if query_terms <= 3 else 6
+        top_k_docs = 25
 
         if req.method == "rocchio":
             expanded_query = expander.expand_rocchio(
