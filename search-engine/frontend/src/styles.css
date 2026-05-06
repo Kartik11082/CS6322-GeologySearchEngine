@@ -183,19 +183,37 @@ input, select {
 }
 
 
+.team-table {
+  margin: 36px auto 0;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.team-table td {
+  padding: 5px 18px 5px 0;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+.team-table td:last-child { padding-right: 0; }
+.team-role {
+  color: var(--text-3);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+.team-id {
+  color: var(--text-3);
+  font-size: 12px;
+  font-family: monospace;
+}
+
 .landing-footer {
-  margin-top: 56px;
+  margin-top: 28px;
   color: var(--text-3);
   font-size: 13px;
   letter-spacing: 0.02em;
   text-align: center;
 }
-.landing-footer button {
-  color: var(--text-2);
-  text-decoration: underline;
-  padding: 0 4px;
-}
-.landing-footer button:hover { color: var(--text); }
 
 /* ============================================================
    Post-search top bar
@@ -343,8 +361,7 @@ input, select {
   padding: 0 32px;
   display: flex;
   gap: 4px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
 }
 .tab {
   position: relative;

@@ -194,7 +194,7 @@ function getStatus(panel, emptyMessage, skeletonCount = 5) {
 /* ================================================================
    LANDING
    ================================================================ */
-function Landing({ queryInput, setQueryInput, onSubmit, onAbout }) {
+function Landing({ queryInput, setQueryInput, onSubmit }) {
   return (
     <div className="landing">
       <div className="brand">
@@ -214,10 +214,17 @@ function Landing({ queryInput, setQueryInput, onSubmit, onAbout }) {
         </div>
       </form>
 
-      <div className="landing-footer">
-        CS 6322 · UTD · Geology corpus ·{" "}
-        <button type="button" onClick={onAbout}>About this project</button>
-      </div>
+      <table className="team-table">
+        <tbody>
+          <tr><td className="team-role">Crawler</td><td className="team-name">Zafeer Rangoonwala</td><td className="team-id">zxr240004</td></tr>
+          <tr><td className="team-role">Indexer</td><td className="team-name">Rahul Patil</td><td className="team-id">rxp240025</td></tr>
+          <tr><td className="team-role">Interface</td><td className="team-name">Kartik Karkera</td><td className="team-id">KXK230091</td></tr>
+          <tr><td className="team-role">Clustering</td><td className="team-name">Preeti Vasaikar</td><td className="team-id">pxv230036</td></tr>
+          <tr><td className="team-role">Query Expansion</td><td className="team-name">Uddesh Singh</td><td className="team-id">uxs230004</td></tr>
+        </tbody>
+      </table>
+
+      <div className="landing-footer">CS 6322 · UTD · Geology corpus</div>
     </div>
   );
 }
@@ -426,7 +433,7 @@ function ClusterSidebar({ clusters, activeClusterId, setActiveClusterId }) {
 /* ================================================================
    CLUSTERED PANE
    ================================================================ */
-function ClusteredPane({ panel, activeClusterId, setActiveClusterId, clusterMethod }) {
+function ClusteredPane({ panel, activeClusterId, setActiveClusterId, clusterMethod, clusterSearchMethod, setClusterSearchMethod }) {
   const status = getStatus(panel, "Run a query to inspect clustered reranking.");
   if (status) {
     return (
@@ -466,6 +473,20 @@ function ClusteredPane({ panel, activeClusterId, setActiveClusterId, clusterMeth
             <span className="info-tip" aria-label="Results from the relevance backbone grouped by topical cluster, then reranked using cluster affinity and support. Score = baseline × 0.7 + cluster_affinity × 0.2 + cluster_support × 0.1">?</span>
           </h2>
           <PaneAttrib who="cluster" />
+        </div>
+
+        <div className="model-pills">
+          {[
+            { value: "tfidf", label: "TF-IDF" },
+            { value: "pagerank", label: "PageRank" },
+            { value: "hits", label: "HITS" },
+            { value: "tfidf_pagerank", label: "TF-IDF + PageRank" },
+            { value: "tfidf_hits", label: "TF-IDF + HITS" },
+          ].map((o) => (
+            <button key={o.value} type="button" className={`mpill${clusterSearchMethod === o.value ? " on" : ""}`} onClick={() => setClusterSearchMethod(o.value)}>
+              {o.label}
+            </button>
+          ))}
         </div>
 
         <div className="hint">
@@ -541,19 +562,18 @@ function ExpandedPane({ panel, searchQuery, expansionMethod, expandSearchMethod,
         <PaneAttrib who="expand" />
       </div>
 
-      <div className="cmp-controls">
-        <label className="ctl">
-          <span className="ctl-lbl">Search model</span>
-          <select value={expandSearchMethod} onChange={(e) => setExpandSearchMethod(e.target.value)}>
-            {[
-              { value: "tfidf", label: "TF-IDF" },
-              { value: "pagerank", label: "PageRank" },
-              { value: "hits", label: "HITS" },
-              { value: "tfidf_pagerank", label: "TF-IDF + PageRank" },
-              { value: "tfidf_hits", label: "TF-IDF + HITS" },
-            ].map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-        </label>
+      <div className="model-pills">
+        {[
+          { value: "tfidf", label: "TF-IDF" },
+          { value: "pagerank", label: "PageRank" },
+          { value: "hits", label: "HITS" },
+          { value: "tfidf_pagerank", label: "TF-IDF + PageRank" },
+          { value: "tfidf_hits", label: "TF-IDF + HITS" },
+        ].map((o) => (
+          <button key={o.value} type="button" className={`mpill${expandSearchMethod === o.value ? " on" : ""}`} onClick={() => setExpandSearchMethod(o.value)}>
+            {o.label}
+          </button>
+        ))}
       </div>
 
       <div className="expbanner">
@@ -930,6 +950,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState(initial.tab);
   const [activeModel, setActiveModel] = useState("tfidf");
   const [expandSearchMethod, setExpandSearchMethod] = useState("hits");
+  const [clusterSearchMethod, setClusterSearchMethod] = useState("hits");
   const [activeClusterId, setActiveClusterId] = useState(null);
   const [results, setResults] = useState(createInitialResults);
   const [lastSearch, setLastSearch] = useState(initial.query);
@@ -981,12 +1002,12 @@ export default function App() {
     );
     requestJson("/api/clustered-search", {
       method: "POST",
-      body: { query: lastSearch, cluster_method: clusterMethod, baseline_method: "combined", top_k: topK },
+      body: { query: lastSearch, cluster_method: clusterMethod, baseline_method: clusterSearchMethod, top_k: topK },
     })
       .then((data) => patchResults(rid, (cur) => ({ ...cur, clustered: { status: "success", data, error: "" } })))
       .catch((err) => patchResults(rid, (cur) => ({ ...cur, clustered: { status: "error", data: null, error: err.message } })));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [clusterMethod]);
+  }, [clusterMethod, clusterSearchMethod]);
 
   function patchResults(requestId, updater) {
     if (requestIdRef.current !== requestId) return;
@@ -1057,7 +1078,7 @@ export default function App() {
 
     requestJson("/api/clustered-search", {
       method: "POST",
-      body: { query: q, cluster_method: clusterMethod, baseline_method: "combined", top_k: topK },
+      body: { query: q, cluster_method: clusterMethod, baseline_method: clusterSearchMethod, top_k: topK },
     })
       .then((data) => patchResults(rid, (cur) => ({ ...cur, clustered: { status: "success", data, error: "" } })))
       .catch((err) => patchResults(rid, (cur) => ({ ...cur, clustered: { status: "error", data: null, error: err.message } })));
@@ -1089,7 +1110,6 @@ export default function App() {
           queryInput={queryInput}
           setQueryInput={setQueryInput}
           onSubmit={onSubmit}
-          onAbout={() => setView("about")}
         />
       </div>
     );
@@ -1121,6 +1141,8 @@ export default function App() {
             activeClusterId={activeClusterId}
             setActiveClusterId={setActiveClusterId}
             clusterMethod={clusterMethod}
+            clusterSearchMethod={clusterSearchMethod}
+            setClusterSearchMethod={setClusterSearchMethod}
           />
         )}
         {activeTab === "expanded" && (
