@@ -1,0 +1,25 @@
+Formula: C(u,v) = Σ [1 / |pos(u) - pos(v)|]
+Summed across all documents and position pairs
+
+Documents with position data: 50
+
+Query stem 'pyroclast': No position data found
+
+Query stem: 'flow'
+    Co-located with 4 candidate terms
+
+    Candidate Term         Σ(1/distance) Interpretation                
+    -------------------- --------------- ------------------------------
+    smoki                       1.000000 Distant                       
+    restor                      0.142857 Distant                       
+    everglad                    0.100000 Distant                       
+    organiz                     0.043478 Distant                       
+
+Query stem 'danger': No position data found
+
+----------------------------------------
+CLUSTER SELECTION DISCUSSION:
+----------------------------------------
+
+Proximity on preprocess(text_preview) matches expand_metric in core.py: inverse word distance summed
+within each snippet, gated by expander._is_candidate_term before IDF boosting and final lemmas.

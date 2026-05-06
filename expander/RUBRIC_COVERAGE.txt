@@ -1,0 +1,53 @@
+X5 RUBRIC → REPO ARTIFACTS (checklist)
+======================================
+
+Use this file when assembling the PDF for graders. Regenerate machine outputs from
+project root with a built index loaded by SearchEngine.
+
+Rocchio — 20 queries (3 + 3 + 3 pts)
+-----------------------------------
+  • Selection rationale + numbered list
+      → expansion_report.txt preamble + section "LIST: 20 ROCCHIO QUERIES"
+  • Examples of relevant / irrelevant pages + judgments
+      → EXPERIMENT 1 blocks: URLs, titles, and "Judgment note" (batch protocol);
+        add 2–3 fully manual examples in prose in your PDF if required.
+  • Modified queries after Rocchio
+      → EXPERIMENT 1: "Expanded Query" lines + before/after HITS result lists
+
+PRF — 50 queries (3 pts discussion + per-method items)
+------------------------------------------------------
+  • Discuss the 50 queries + list them
+      → preamble + "LIST: 50 PRF BENCHMARK QUERIES"
+      → Source: cluster_service/benchmarks/queries_50.json (shared with X2/X3)
+
+  Per method (association, scalar, metric), 3 example queries:
+  (1) Local document set
+  (2) Local vocabulary / stems
+  (3) Correlation values + cluster selection discussion
+  (4) Expanded queries + search results + discussion
+      → Run: python expander/method_analysis_association.py
+             python expander/method_analysis_scalar.py
+             python expander/method_analysis_metric.py
+      → Artifacts: expander/textfiles/{Associative,Scalar,Metric}/q{1,2,3}_*.txt
+      → Merged: expander/report_ASSOCIATION_clustering.txt (and _SCALAR_, _METRIC_)
+      → Example queries: expander/method_analysis_queries.py
+
+  Optional single-file narrative (all methods):
+      → python expander/docs/detailed_clustering_analysis.py
+      → expander/clustering_detailed_report.txt
+
+Full 50 × 3 methods + HITS after expansion
+------------------------------------------
+  → python expander/evaluate.py
+  → expander/expansion_report.txt
+
+X3 display / API
+----------------
+  • POST /api/expand returns expanded_query + results for UI (backend/app.py).
+  • Contract: expander/api_contract.md
+
+Parameter alignment (evaluate, method scripts, backend)
+-------------------------------------------------------
+  • Local pseudo-relevant set: top 50 HITS (core.QueryExpander._get_local_doc_set)
+  • m_neighbors: 2 if query has ≤3 tokens else 6
+  • max_new_terms: 5 for association / scalar / metric (backend)

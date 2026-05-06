@@ -1,0 +1,36 @@
+Formula: S(u,v) = (s_u · s_v) / (|s_u| × |s_v|)
+Where s_u[j] = f(u, doc_j) for doc j in local set (document-frequency vectors on D_l).
+
+
+Query stem 'pyroclast': Not found in local vocabulary
+
+Query stem: 'flow'
+    Association vector norm |s_flow| = 4.1231
+    Appears in 6 local documents
+
+    Candidate Term          Dot Product      |s_v|       S(u,v)
+    -------------------- -------------- ---------- ------------
+    hammond                        8.00       2.24     0.867722
+    variabl                       10.00       2.83     0.857493
+    graviti                        5.00       1.41     0.857493
+    yearli                         5.00       1.41     0.857493
+    glenn                          5.00       1.41     0.857493
+    todd                           5.00       1.41     0.857493
+    caldwel                        5.00       1.41     0.857493
+    melissa                        5.00       1.41     0.857493
+    conu                           5.00       1.41     0.857493
+    dudley                         5.00       1.41     0.857493
+    wieczorek                      5.00       1.41     0.857493
+    lombard                        5.00       1.41     0.857493
+
+Query stem 'danger': Not found in local vocabulary
+
+----------------------------------------
+CLUSTER SELECTION DISCUSSION:
+----------------------------------------
+
+Scalar cosine on document-frequency vectors matches expand_scalar in core.py:
+
+    S(u,v) = Σ_d f(u,d)f(v,d) / (sqrt(Σ_d f(u,d)^2) sqrt(Σ_d f(v,d)^2))
+
+Neighborhoods ranked by cosine are then boosted by expander._score_expansion_term (IDF, etc.).

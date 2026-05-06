@@ -1,0 +1,244 @@
+================================================================================
+METRIC CLUSTERING - DETAILED ANALYSIS (merged from textfiles/)
+Student: Uddesh Singh | NetID: UXS230004
+================================================================================
+
+Formula: C(u,v) = Σ [ 1 / |pos(u) - pos(v)| ] over text_preview token positions.
+Number of documents: 50
+Method: Top-50 HITS on normalized query 'pyroclast flow danger' (same as QueryExpander._get_local_doc_set / backend local set)
+
+Document IDs:
+    100, 1256, 13329, 14368, 14384, 14409, 14418, 14435, 14498, 14556
+    14667, 14845, 1533, 1582, 16276, 16322, 16344, 16392, 16450, 16573
+    16618, 16728, 16809, 16860, 17750, 17821, 17989, 18203, 18306, 18545
+    19633, 19835, 22301, 22308, 24365, 25884, 28414, 31521, 31529, 31535
+    31537, 31555, 31575, 31619, 31769, 34116, 34321, 34540, 6198, 6816
+
+Sample Documents with URLs:
+    [100] https://pubs.usgs.gov/circ/c1050
+    [1256] https://www.usgs.gov/
+    [13329] https://www.usgs.gov/science/science-explorer/biology
+    [14368] https://www.usgs.gov/science/science-explorer/coasts
+    [14384] https://www.usgs.gov/science/science-explorer/climate
+    [14409] https://www.usgs.gov/search?keywords=energy
+    [14418] https://www.usgs.gov/search?keywords=environmental+health
+    [14435] https://www.usgs.gov/search?keywords=geology
+
+Query: "pyroclastic flow danger"
+Query stems (after preprocessing): ['pyroclast', 'flow', 'danger']
+
+Total unique stems in local vocabulary: 1267
+
+Local vocabulary sample (first 80 alphabetical stems):
+    abund, acceler, accept, access, accur, achiev, acquisit, across, act, action
+    activ, adapt, addit, address, adjac, advanc, adventur, advers, advis, advisori
+    affect, age, agenc, agenda, agreement, agricultur, ahead, ahi, ai, aim
+    air, airborn, airplan, alaska, alert, allow, almost, along, also, altern
+    america, american, among, analysi, analyt, analyz, anim, announc, annual, answer
+    antarct, anticip, appli, applic, approach, april, aquadepth, aquat, aquif, archiv
+    area, arizona, arm, aroostook, around, array, art, articl, artifici, arundel
+    asist, ask, aspect, assess, assist, associ, astrogeolog, atlant, attribut, august
+
+Vocabulary statistics:
+    - Total terms in local set: 1267
+    - Alphabetic terms only: 1198
+    - Terms appearing in 2+ local docs: 1267
+
+Formula: C(u,v) = Σ [1 / |pos(u) - pos(v)|]
+Summed across all documents and position pairs
+
+Documents with position data: 50
+
+Query stem 'pyroclast': No position data found
+
+Query stem: 'flow'
+    Co-located with 4 candidate terms
+
+    Candidate Term         Σ(1/distance) Interpretation                
+    -------------------- --------------- ------------------------------
+    smoki                       1.000000 Distant                       
+    restor                      0.142857 Distant                       
+    everglad                    0.100000 Distant                       
+    organiz                     0.043478 Distant                       
+
+Query stem 'danger': No position data found
+
+----------------------------------------
+CLUSTER SELECTION DISCUSSION:
+----------------------------------------
+
+Proximity on preprocess(text_preview) matches expand_metric in core.py: inverse word distance summed
+within each snippet, gated by expander._is_candidate_term before IDF boosting and final lemmas.
+
+(4) EXPANDED QUERY AND SEARCH ENGINE RESULTS
+
+Expanded query: pyroclastic flow dangerous smoky restoration
+
+Top 10 results (HITS) on the expanded query:
+
+   1. doc_id=1533 | https://earthquake.usgs.gov/earthquakes/map
+   2. doc_id=100 | https://pubs.usgs.gov/circ/c1050
+   3. doc_id=1582 | https://www.usgs.gov/science/faqs
+   4. doc_id=1256 | https://www.usgs.gov/
+   5. doc_id=14667 | https://www.usgs.gov/search?keywords=information+systems
+   6. doc_id=14409 | https://www.usgs.gov/search?keywords=energy
+   7. doc_id=14418 | https://www.usgs.gov/search?keywords=environmental+health
+   8. doc_id=14435 | https://www.usgs.gov/search?keywords=geology
+   9. doc_id=16618 | https://www.usgs.gov/search?keywords=water
+  10. doc_id=17821 | https://www.usgs.gov/news/news-releases
+
+Report note: Compare these URLs to a HITS run on the original query; discuss whether expansion helped topical precision or introduced drift.
+
+Number of documents: 50
+Method: Top-50 HITS on normalized query 'metamorph gneiss format' (same as QueryExpander._get_local_doc_set / backend local set)
+
+Document IDs:
+    100, 1256, 13329, 14368, 14384, 14409, 14418, 14435, 14498, 14556
+    14667, 14845, 1533, 1582, 16207, 16276, 16322, 16344, 16392, 16450
+    16573, 16618, 16728, 16809, 16860, 16919, 17821, 17989, 18203, 18306
+    18545, 18666, 19633, 22301, 22308, 24365, 28414, 31513, 31529, 31535
+    31537, 31555, 31575, 31619, 31769, 34116, 34321, 34540, 6198, 6262
+
+Sample Documents with URLs:
+    [100] https://pubs.usgs.gov/circ/c1050
+    [1256] https://www.usgs.gov/
+    [13329] https://www.usgs.gov/science/science-explorer/biology
+    [14368] https://www.usgs.gov/science/science-explorer/coasts
+    [14384] https://www.usgs.gov/science/science-explorer/climate
+    [14409] https://www.usgs.gov/search?keywords=energy
+    [14418] https://www.usgs.gov/search?keywords=environmental+health
+    [14435] https://www.usgs.gov/search?keywords=geology
+
+Query: "metamorphic gneiss formation"
+Query stems (after preprocessing): ['metamorph', 'gneiss', 'format']
+
+Total unique stems in local vocabulary: 1320
+
+Local vocabulary sample (first 80 alphabetical stems):
+    abil, abstract, abund, acceler, access, accru, accur, achiev, acquisit, across
+    act, action, activ, adapt, addit, address, adjac, advanc, advantag, advers
+    advis, advisori, affect, age, agenc, agenda, agreement, agricultur, ahead, ahi
+    ai, aim, air, airborn, airplan, ak, alaska, alert, alm, almost
+    along, also, alter, altern, america, american, among, analysi, analyt, analyz
+    anim, announc, annual, anoth, answer, anticip, appli, applic, approach, appropri
+    approxim, april, aquadepth, aquat, aquif, archiv, arctic, area, arizona, arm
+    aroostook, around, array, art, articl, artifici, arundel, asist, ask, aspect
+
+Vocabulary statistics:
+    - Total terms in local set: 1320
+    - Alphabetic terms only: 1249
+    - Terms appearing in 2+ local docs: 1320
+
+Formula: C(u,v) = Σ [1 / |pos(u) - pos(v)|]
+Summed across all documents and position pairs
+
+Documents with position data: 50
+
+Query stem 'metamorph': No position data found
+
+Query stem 'gneiss': No position data found
+
+Query stem 'format': No position data found
+
+----------------------------------------
+CLUSTER SELECTION DISCUSSION:
+----------------------------------------
+
+Proximity on preprocess(text_preview) matches expand_metric in core.py: inverse word distance summed
+within each snippet, gated by expander._is_candidate_term before IDF boosting and final lemmas.
+
+(4) EXPANDED QUERY AND SEARCH ENGINE RESULTS
+
+Expanded query: metamorphic gneiss formation
+
+Top 10 results (HITS) on the expanded query:
+
+   1. doc_id=1533 | https://earthquake.usgs.gov/earthquakes/map
+   2. doc_id=100 | https://pubs.usgs.gov/circ/c1050
+   3. doc_id=1256 | https://www.usgs.gov/
+   4. doc_id=1582 | https://www.usgs.gov/science/faqs
+   5. doc_id=14418 | https://www.usgs.gov/search?keywords=environmental+health
+   6. doc_id=14435 | https://www.usgs.gov/search?keywords=geology
+   7. doc_id=14667 | https://www.usgs.gov/search?keywords=information+systems
+   8. doc_id=16618 | https://www.usgs.gov/search?keywords=water
+   9. doc_id=14409 | https://www.usgs.gov/search?keywords=energy
+  10. doc_id=14556 | https://www.usgs.gov/regions/southwest
+
+Report note: Compare these URLs to a HITS run on the original query; discuss whether expansion helped topical precision or introduced drift.
+
+Number of documents: 50
+Method: Top-50 HITS on normalized query 'groundwat aquif permeabl' (same as QueryExpander._get_local_doc_set / backend local set)
+
+Document IDs:
+    100, 1256, 13329, 14368, 14384, 14409, 14418, 14435, 14498, 14556
+    14667, 14845, 1533, 1582, 16207, 16276, 16322, 16344, 16392, 16450
+    16573, 16618, 16728, 16809, 17750, 17821, 17989, 18203, 18306, 18545
+    18666, 19633, 22308, 24365, 28414, 31521, 31529, 31535, 31537, 31555
+    31575, 31585, 31619, 31769, 34116, 34321, 34540, 6198, 6262, 6816
+
+Sample Documents with URLs:
+    [100] https://pubs.usgs.gov/circ/c1050
+    [1256] https://www.usgs.gov/
+    [13329] https://www.usgs.gov/science/science-explorer/biology
+    [14368] https://www.usgs.gov/science/science-explorer/coasts
+    [14384] https://www.usgs.gov/science/science-explorer/climate
+    [14409] https://www.usgs.gov/search?keywords=energy
+    [14418] https://www.usgs.gov/search?keywords=environmental+health
+    [14435] https://www.usgs.gov/search?keywords=geology
+
+Query: "groundwater aquifer permeability"
+Query stems (after preprocessing): ['groundwat', 'aquif', 'permeabl']
+
+Total unique stems in local vocabulary: 1259
+
+Local vocabulary sample (first 80 alphabetical stems):
+    abstract, abund, access, accur, acquisit, across, act, action, activ, adapt
+    addit, address, adjac, advanc, advers, advis, advisori, affect, age, agenc
+    agenda, agreement, agricultur, ahead, ahi, ai, airborn, airplan, ak, alaska
+    alert, allow, almost, along, also, alter, america, american, among, analysi
+    analyt, analyz, anim, announc, annual, answer, anticip, applic, approach, appropri
+    approxim, april, aquadepth, aquat, aquif, archiv, arctic, area, arizona, arm
+    aroostook, around, array, art, articl, artifici, arundel, ask, aspect, assess
+    assist, associ, astrogeolog, atlant, attribut, august, australia, author, authorit, autom
+
+Vocabulary statistics:
+    - Total terms in local set: 1259
+    - Alphabetic terms only: 1193
+    - Terms appearing in 2+ local docs: 1259
+
+Formula: C(u,v) = Σ [1 / |pos(u) - pos(v)|]
+Summed across all documents and position pairs
+
+Documents with position data: 50
+
+Query stem 'groundwat': No position data found
+
+Query stem 'aquif': No position data found
+
+Query stem 'permeabl': No position data found
+
+----------------------------------------
+CLUSTER SELECTION DISCUSSION:
+----------------------------------------
+
+Proximity on preprocess(text_preview) matches expand_metric in core.py: inverse word distance summed
+within each snippet, gated by expander._is_candidate_term before IDF boosting and final lemmas.
+
+(4) EXPANDED QUERY AND SEARCH ENGINE RESULTS
+
+Expanded query: groundwater aquifer permeability
+
+Top 10 results (HITS) on the expanded query:
+
+   1. doc_id=1533 | https://earthquake.usgs.gov/earthquakes/map
+   2. doc_id=100 | https://pubs.usgs.gov/circ/c1050
+   3. doc_id=1256 | https://www.usgs.gov/
+   4. doc_id=1582 | https://www.usgs.gov/science/faqs
+   5. doc_id=14418 | https://www.usgs.gov/search?keywords=environmental+health
+   6. doc_id=14435 | https://www.usgs.gov/search?keywords=geology
+   7. doc_id=14667 | https://www.usgs.gov/search?keywords=information+systems
+   8. doc_id=14409 | https://www.usgs.gov/search?keywords=energy
+   9. doc_id=16618 | https://www.usgs.gov/search?keywords=water
+  10. doc_id=18203 | https://www.usgs.gov/regions/northeast-region
+
+Report note: Compare these URLs to a HITS run on the original query; discuss whether expansion helped topical precision or introduced drift.

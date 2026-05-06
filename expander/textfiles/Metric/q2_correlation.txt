@@ -1,0 +1,17 @@
+Formula: C(u,v) = Σ [1 / |pos(u) - pos(v)|]
+Summed across all documents and position pairs
+
+Documents with position data: 50
+
+Query stem 'metamorph': No position data found
+
+Query stem 'gneiss': No position data found
+
+Query stem 'format': No position data found
+
+----------------------------------------
+CLUSTER SELECTION DISCUSSION:
+----------------------------------------
+
+Proximity on preprocess(text_preview) matches expand_metric in core.py: inverse word distance summed
+within each snippet, gated by expander._is_candidate_term before IDF boosting and final lemmas.

@@ -17,10 +17,12 @@ from method_analysis_io import merge_textfiles_into_report, write_query_textfile
 from method_analysis_queries import METHOD_ANALYSIS_QUERIES
 from method_analysis_sections import (
     format_association_correlations,
+    format_expansion_section,
     format_lds_section,
     format_stems_section,
     local_analysis_context,
 )
+from query_sets import m_neighbors_for_query
 
 
 def main() -> None:
@@ -34,12 +36,13 @@ def main() -> None:
         ctx = local_analysis_context(expander, engine, query, top_k=50)
         query_stems = ctx["query_stems"]
 
+        m_neighbors = m_neighbors_for_query(query)
         expanded = expander.expand_association(
             query,
             top_k_docs=50,
-            m_neighbors=4,
+            m_neighbors=m_neighbors,
             normalized=True,
-            max_new_terms=6,
+            max_new_terms=5,
         )
         new_terms = [
             t for t in expanded.split() if t not in set(query_stems)
@@ -49,7 +52,8 @@ def main() -> None:
         stems = format_stems_section(ctx)
         corr = format_association_correlations(ctx, expander)
 
-        write_query_textfiles(METHOD, q_idx, lds, stems, corr)
+        expansion = format_expansion_section(engine, expanded)
+        write_query_textfiles(METHOD, q_idx, lds, stems, corr, expansion)
 
         print(f"[{METHOD}] q{q_idx} expanded: {expanded}")
         print(f"  new terms (stem set diff): {new_terms}")

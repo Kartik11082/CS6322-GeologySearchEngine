@@ -1,0 +1,53 @@
+Formula: S(u,v) = (s_u · s_v) / (|s_u| × |s_v|)
+Where s_u[j] = f(u, doc_j) for doc j in local set (document-frequency vectors on D_l).
+
+
+Query stem: 'groundwat'
+    Association vector norm |s_groundwat| = 9.8995
+    Appears in 8 local documents
+
+    Candidate Term          Dot Product      |s_v|       S(u,v)
+    -------------------- -------------- ---------- ------------
+    variabl                       24.00       2.83     0.857143
+    graviti                       12.00       1.41     0.857143
+    metric                        12.00       1.41     0.857143
+    contermin                     12.00       1.41     0.857143
+    yearli                        12.00       1.41     0.857143
+    glenn                         12.00       1.41     0.857143
+    todd                          12.00       1.41     0.857143
+    caldwel                       12.00       1.41     0.857143
+    melissa                       12.00       1.41     0.857143
+    conu                          12.00       1.41     0.857143
+    dudley                        12.00       1.41     0.857143
+    wieczorek                     12.00       1.41     0.857143
+
+Query stem: 'aquif'
+    Association vector norm |s_aquif| = 4.3589
+    Appears in 5 local documents
+
+    Candidate Term          Dot Product      |s_v|       S(u,v)
+    -------------------- -------------- ---------- ------------
+    subsurfac                      7.00       2.24     0.718185
+    freshwat                      18.00       6.08     0.678883
+    cold                           9.00       3.16     0.652929
+    midwestern                     8.00       2.83     0.648886
+    roosevelt                      4.00       1.41     0.648886
+    iowa                           4.00       1.41     0.648886
+    curri                          4.00       1.41     0.648886
+    biogeochem                     4.00       1.41     0.648886
+    missouri                       4.00       1.41     0.648886
+    aroostook                      4.00       1.41     0.648886
+    parmer                         4.00       1.41     0.648886
+    northeastern                  14.00       5.00     0.642364
+
+Query stem 'permeabl': Not found in local vocabulary
+
+----------------------------------------
+CLUSTER SELECTION DISCUSSION:
+----------------------------------------
+
+Scalar cosine on document-frequency vectors matches expand_scalar in core.py:
+
+    S(u,v) = Σ_d f(u,d)f(v,d) / (sqrt(Σ_d f(u,d)^2) sqrt(Σ_d f(v,d)^2))
+
+Neighborhoods ranked by cosine are then boosted by expander._score_expansion_term (IDF, etc.).

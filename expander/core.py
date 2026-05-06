@@ -120,6 +120,16 @@ class LemmaResolver:
         self._cache[stem] = lemma
         return lemma
 
+    def stem_to_surface(self, stem: str) -> str | None:
+        """Return most common corpus surface form for a stem, if available."""
+        surface = self._stem_to_surface.get(stem)
+        if not surface:
+            return None
+        surface = surface.lower().strip()
+        if not surface.isalpha() or len(surface) <= 2:
+            return None
+        return surface
+
 
 class QueryExpander:
     def __init__(self, search_engine):
@@ -165,6 +175,122 @@ class QueryExpander:
     def normalize_query(self, query: str) -> str:
         """Public helper for consumers that need corrected query text."""
         return self._normalize_query_for_expansion(query)
+
+    def _natural_word_for_stem(self, stem: str) -> str | None:
+        """
+        Render a stem as a natural display token.
+
+        Preference order:
+        1) spaCy lemma when available and clean
+        2) most-common corpus surface form
+        3) no token (avoid exposing stem artifacts to API consumers)
+        """
+        lemma = self._lemma.stem_to_lemma(stem).lower().strip()
+        if lemma != stem and lemma.isalpha() and len(lemma) > 2:
+            return lemma
+
+        surface = self._lemma.stem_to_surface(stem)
+        if surface:
+            return surface
+
+        return None
+
+    def _safe_stem_as_display(self, stem: str) -> str | None:
+        """
+        Last-resort display token: Porter stem that still looks like a real word.
+
+        Used only when lemma/surface are unavailable and policy allows (see m_neighbors).
+        """
+        if not stem.isalpha() or len(stem) <= 2 or len(stem) > 24:
+            return None
+        if stem in EXPANSION_STOPLIST:
+            return None
+        df = len(self.engine.inverted_index.get(stem, {}))
+        if df < 4:
+            return None
+        return stem
+
+    @staticmethod
+    def _expansion_stem_fallback_slots(m_neighbors: int | None) -> int:
+        """
+        How many expansion terms may fall back to a clean stem for display.
+
+        Tight neighbor sets (few alternatives) may use one stem fallback;
+        large neighbor sets should prefer lemma/surface only.
+        """
+        if m_neighbors is None:
+            return 1
+        if m_neighbors >= 6:
+            return 0
+        return 1
+
+    def _natural_word_for_base_stem(self, stem: str) -> str | None:
+        """Prefer lemma/surface for query tokens; allow safe stem so the query is not empty."""
+        n = self._natural_word_for_stem(stem)
+        if n:
+            return n
+        return self._safe_stem_as_display(stem)
+
+    def _stem_key(self, token: str) -> str:
+        """Canonical dedupe key across inflections (e.g., type/types)."""
+        stems = preprocess(token)
+        return stems[0] if stems else token.lower()
+
+    def _compose_display_query(
+        self,
+        normalized_query: str,
+        new_stems: list[str],
+        m_neighbors: int | None = None,
+    ) -> str:
+        """
+        Build display query with natural words only.
+
+        - Base query uses normalized terms converted to natural words.
+        - Added expansion terms are naturalized and deduped by stem family.
+        - Optional clean stem fallback for *expansion* terms when m_neighbors is small
+          (see _expansion_stem_fallback_slots); no stem fallback when m_neighbors >= 6.
+        """
+        base_stems = normalized_query.split()
+        base_tokens: list[str] = []
+        seen_keys: set[str] = set()
+
+        for stem in base_stems:
+            natural = self._natural_word_for_base_stem(stem)
+            if not natural:
+                continue
+            key = self._stem_key(natural)
+            if key in seen_keys:
+                continue
+            seen_keys.add(key)
+            base_tokens.append(natural)
+
+        fallback_left = self._expansion_stem_fallback_slots(m_neighbors)
+        added_tokens: list[str] = []
+        for stem in new_stems:
+            # Drop glued compounds that simply append/prepend original query stems,
+            # e.g. "eruptionvolcano" for query stem "volcano".
+            if any(
+                q_stem in stem and q_stem != stem and len(stem) > len(q_stem) + 2
+                for q_stem in base_stems
+            ):
+                continue
+            natural = self._natural_word_for_stem(stem)
+            if not natural and fallback_left > 0:
+                sf = self._safe_stem_as_display(stem)
+                if sf:
+                    natural = sf
+                    fallback_left -= 1
+            if not natural:
+                continue
+            key = self._stem_key(natural)
+            if key in seen_keys:
+                continue
+            seen_keys.add(key)
+            added_tokens.append(natural)
+
+        if base_tokens or added_tokens:
+            return " ".join(base_tokens + added_tokens)
+        return normalized_query
 
     # =====================================================================
     #  1. ROCCHIO RELEVANCE FEEDBACK (Lecture 12)
@@ -251,8 +377,7 @@ class QueryExpander:
                 break
         # debug logging removed
 
-        lemma_terms = [self._lemma.stem_to_lemma(t) for t in new_terms]
-        return f"{query} {' '.join(lemma_terms)}"
+        return self._compose_display_query(query, new_terms, m_neighbors=None)
 
     # =====================================================================
     #  HELPERS FOR LOCAL CLUSTERING (QE Local Strategies)
@@ -279,6 +404,7 @@ class QueryExpander:
         candidate_scores: dict[str, float],
         max_new_terms: int,
         query_len: int,
+        m_neighbors: int,
     ) -> str:
         """
         Build a deterministic expanded query from ranked candidate terms.
@@ -287,15 +413,14 @@ class QueryExpander:
         - Adds top-scoring non-duplicate candidate terms.
         - Falls back to original query when candidates are weak/empty.
         """
-        original_tokens = query.split()
-        original_token_set = set(original_tokens)
+        original_stem_set = set(query_stems)
 
         ranked = sorted(candidate_scores.items(), key=lambda x: x[1], reverse=True)
         new_terms = []
         for term, score in ranked:
             if score <= 0:
                 continue
-            if term in original_token_set or term in new_terms:
+            if term in original_stem_set or term in new_terms:
                 continue
             if not self._is_candidate_term(term, query_stems, query_len=query_len):
                 continue
@@ -303,19 +428,7 @@ class QueryExpander:
             if len(new_terms) >= max_new_terms:
                 break
 
-        if not new_terms:
-            return query
-
-        lemma_new: list[str] = []
-        seen_lemma: set[str] = set()
-        for stem_term in new_terms:
-            lm = self._lemma.stem_to_lemma(stem_term)
-            key = lm.lower()
-            if key in seen_lemma:
-                continue
-            seen_lemma.add(key)
-            lemma_new.append(lm)
-        return " ".join(original_tokens + lemma_new)
+        return self._compose_display_query(query, new_terms, m_neighbors=m_neighbors)
 
     # =====================================================================
     #  2. ASSOCIATION CLUSTERS
@@ -380,6 +493,7 @@ class QueryExpander:
             candidate_scores=candidate_scores,
             max_new_terms=max_new_terms,
             query_len=query_len,
+            m_neighbors=m_neighbors,
         )
 
     # =====================================================================
@@ -455,6 +569,7 @@ class QueryExpander:
             candidate_scores=candidate_scores,
             max_new_terms=max_new_terms,
             query_len=query_len,
+            m_neighbors=m_neighbors,
         )
 
     # =====================================================================
@@ -525,6 +640,7 @@ class QueryExpander:
             candidate_scores=candidate_scores,
             max_new_terms=max_new_terms,
             query_len=query_len,
+            m_neighbors=m_neighbors,
         )
 
     def _is_candidate_term(

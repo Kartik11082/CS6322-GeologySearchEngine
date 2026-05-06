@@ -1,0 +1,53 @@
+Formula: C(u,v) = Σ [f(u,j) × f(v,j)] for all docs j in local set
+Normalized by: C(u,v) / (Σf(u) × Σf(v))
+
+
+Query stem: 'groundwat'
+    Frequency sum Σf(groundwat) = 24
+    Appears in 8 local documents
+
+    Candidate Term         Raw C(u,v)   Normalized
+    -------------------- ------------ ------------
+    variabl                     24.00     0.250000
+    graviti                     12.00     0.250000
+    metric                      12.00     0.250000
+    england                     36.00     0.250000
+    contermin                   12.00     0.250000
+    yearli                      12.00     0.250000
+    glenn                       12.00     0.250000
+    todd                        12.00     0.250000
+    caldwel                     12.00     0.250000
+    melissa                     12.00     0.250000
+    conu                        12.00     0.250000
+    hammond                     18.00     0.250000
+
+Query stem: 'aquif'
+    Frequency sum Σf(aquif) = 9
+    Appears in 5 local documents
+
+    Candidate Term         Raw C(u,v)   Normalized
+    -------------------- ------------ ------------
+    freshwat                    18.00     0.285714
+    subsurfac                    7.00     0.259259
+    cold                         9.00     0.250000
+    soon                         8.00     0.222222
+    airborn                      8.00     0.222222
+    alter                        6.00     0.222222
+    task                         6.00     0.222222
+    midwestern                   8.00     0.222222
+    northeastern                14.00     0.222222
+    slope                        6.00     0.222222
+    roosevelt                    4.00     0.222222
+    iowa                         4.00     0.222222
+
+Query stem 'permeabl': Not found in local vocabulary
+
+----------------------------------------
+CLUSTER SELECTION DISCUSSION:
+----------------------------------------
+
+Normalized co-occurrence C(u,v) / (Σf(u)Σf(v)) picks terms statistically
+associated with query stems inside the BM25-local document set D_l.
+
+expand_association uses normalized correlation, candidate filtering (_is_candidate_term),
+per-stem neighbor top-m selection, IDF boosting, then _finalize_expansion merges deduplicated lemmas.

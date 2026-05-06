@@ -1,0 +1,19 @@
+Query: "pyroclastic flow danger"
+Query stems (after preprocessing): ['pyroclast', 'flow', 'danger']
+
+Total unique stems in local vocabulary: 1267
+
+Local vocabulary sample (first 80 alphabetical stems):
+    abund, acceler, accept, access, accur, achiev, acquisit, across, act, action
+    activ, adapt, addit, address, adjac, advanc, adventur, advers, advis, advisori
+    affect, age, agenc, agenda, agreement, agricultur, ahead, ahi, ai, aim
+    air, airborn, airplan, alaska, alert, allow, almost, along, also, altern
+    america, american, among, analysi, analyt, analyz, anim, announc, annual, answer
+    antarct, anticip, appli, applic, approach, april, aquadepth, aquat, aquif, archiv
+    area, arizona, arm, aroostook, around, array, art, articl, artifici, arundel
+    asist, ask, aspect, assess, assist, associ, astrogeolog, atlant, attribut, august
+
+Vocabulary statistics:
+    - Total terms in local set: 1267
+    - Alphabetic terms only: 1198
+    - Terms appearing in 2+ local docs: 1267

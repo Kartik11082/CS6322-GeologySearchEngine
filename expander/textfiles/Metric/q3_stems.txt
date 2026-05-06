@@ -1,0 +1,19 @@
+Query: "groundwater aquifer permeability"
+Query stems (after preprocessing): ['groundwat', 'aquif', 'permeabl']
+
+Total unique stems in local vocabulary: 1259
+
+Local vocabulary sample (first 80 alphabetical stems):
+    abstract, abund, access, accur, acquisit, across, act, action, activ, adapt
+    addit, address, adjac, advanc, advers, advis, advisori, affect, age, agenc
+    agenda, agreement, agricultur, ahead, ahi, ai, airborn, airplan, ak, alaska
+    alert, allow, almost, along, also, alter, america, american, among, analysi
+    analyt, analyz, anim, announc, annual, answer, anticip, applic, approach, appropri
+    approxim, april, aquadepth, aquat, aquif, archiv, arctic, area, arizona, arm
+    aroostook, around, array, art, articl, artifici, arundel, ask, aspect, assess
+    assist, associ, astrogeolog, atlant, attribut, august, australia, author, authorit, autom
+
+Vocabulary statistics:
+    - Total terms in local set: 1259
+    - Alphabetic terms only: 1193
+    - Terms appearing in 2+ local docs: 1259

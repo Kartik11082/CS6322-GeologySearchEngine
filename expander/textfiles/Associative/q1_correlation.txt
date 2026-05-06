@@ -1,0 +1,36 @@
+Formula: C(u,v) = Σ [f(u,j) × f(v,j)] for all docs j in local set
+Normalized by: C(u,v) / (Σf(u) × Σf(v))
+
+
+Query stem 'pyroclast': Not found in local vocabulary
+
+Query stem: 'flow'
+    Frequency sum Σf(flow) = 9
+    Appears in 6 local documents
+
+    Candidate Term         Raw C(u,v)   Normalized
+    -------------------- ------------ ------------
+    hammond                      8.00     0.296296
+    variabl                     10.00     0.277778
+    graviti                      5.00     0.277778
+    radar                       10.00     0.277778
+    yearli                       5.00     0.277778
+    glenn                        5.00     0.277778
+    todd                         5.00     0.277778
+    caldwel                      5.00     0.277778
+    melissa                      5.00     0.277778
+    conu                         5.00     0.277778
+    dudley                       5.00     0.277778
+    wieczorek                    5.00     0.277778
+
+Query stem 'danger': Not found in local vocabulary
+
+----------------------------------------
+CLUSTER SELECTION DISCUSSION:
+----------------------------------------
+
+Normalized co-occurrence C(u,v) / (Σf(u)Σf(v)) picks terms statistically
+associated with query stems inside the BM25-local document set D_l.
+
+expand_association uses normalized correlation, candidate filtering (_is_candidate_term),
+per-stem neighbor top-m selection, IDF boosting, then _finalize_expansion merges deduplicated lemmas.

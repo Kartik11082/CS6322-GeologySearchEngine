@@ -16,6 +16,7 @@ def write_query_textfiles(
     lds_text: str,
     stems_text: str,
     correlation_text: str,
+    expansion_text: str | None = None,
 ) -> None:
     """method_folder is 'Associative' | 'Scalar' | 'Metric'."""
     out_dir = TEXTFILES_ROOT / method_folder
@@ -28,6 +29,10 @@ def write_query_textfiles(
     for suffix, body in mapping:
         p = out_dir / f"q{q_idx}_{suffix}.txt"
         p.write_text(body.rstrip() + "\n", encoding="utf-8")
+    if expansion_text is not None:
+        (out_dir / f"q{q_idx}_expansion.txt").write_text(
+            expansion_text.rstrip() + "\n", encoding="utf-8"
+        )
 
 
 def merge_textfiles_into_report(method_folder: str, header: str, report_filename: str) -> Path:
@@ -37,7 +42,7 @@ def merge_textfiles_into_report(method_folder: str, header: str, report_filename
     lines = [header.rstrip()]
     folder = TEXTFILES_ROOT / method_folder
     for q_idx in range(1, 4):
-        for part in ("lds", "stems", "correlation"):
+        for part in ("lds", "stems", "correlation", "expansion"):
             p = folder / f"q{q_idx}_{part}.txt"
             if p.exists():
                 lines.append(p.read_text(encoding="utf-8").rstrip())

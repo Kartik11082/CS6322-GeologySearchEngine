@@ -1,0 +1,36 @@
+Formula: C(u,v) = Σ [f(u,j) × f(v,j)] for all docs j in local set
+Normalized by: C(u,v) / (Σf(u) × Σf(v))
+
+
+Query stem 'metamorph': Not found in local vocabulary
+
+Query stem 'gneiss': Not found in local vocabulary
+
+Query stem: 'format'
+    Frequency sum Σf(format) = 20
+    Appears in 5 local documents
+
+    Candidate Term         Raw C(u,v)   Normalized
+    -------------------- ------------ ------------
+    topograph                 1060.00     0.445378
+    custom                     180.00     0.428571
+    smooth                      41.00     0.410000
+    compil                      40.00     0.400000
+    built                       40.00     0.400000
+    schedul                     40.00     0.400000
+    abstract                    20.00     0.333333
+    chart                       20.00     0.333333
+    tradit                      40.00     0.333333
+    trail                       20.00     0.333333
+    frye                        20.00     0.333333
+    transit                     42.00     0.300000
+
+----------------------------------------
+CLUSTER SELECTION DISCUSSION:
+----------------------------------------
+
+Normalized co-occurrence C(u,v) / (Σf(u)Σf(v)) picks terms statistically
+associated with query stems inside the BM25-local document set D_l.
+
+expand_association uses normalized correlation, candidate filtering (_is_candidate_term),
+per-stem neighbor top-m selection, IDF boosting, then _finalize_expansion merges deduplicated lemmas.

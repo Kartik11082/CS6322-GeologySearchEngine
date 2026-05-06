@@ -149,7 +149,7 @@ async def perform_expansion(req: ExpandRequest):
     try:
         query_terms = len(req.query.split())
         m_neighbors = 2 if query_terms <= 3 else 6
-        top_k_docs = 25
+        top_k_docs = 50
 
         if req.method == "rocchio":
             expanded_query = expander.expand_rocchio(
@@ -159,7 +159,7 @@ async def perform_expansion(req: ExpandRequest):
                 alpha=1.0,
                 beta=0.75,
                 gamma=0.25,
-                num_new_terms=10,
+                num_new_terms=5,
             )
         elif req.method == "association":
             expanded_query = expander.expand_association(

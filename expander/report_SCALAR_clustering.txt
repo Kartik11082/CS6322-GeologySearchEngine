@@ -1,0 +1,310 @@
+================================================================================
+SCALAR CLUSTERING - DETAILED ANALYSIS (merged from textfiles/)
+Student: Uddesh Singh | NetID: UXS230004
+================================================================================
+
+Formula: S(u,v) = (s_u · s_v) / (|s_u| × |s_v|) on document-frequency vectors over D_l.
+Number of documents: 50
+Method: Top-50 HITS on normalized query 'pyroclast flow danger' (same as QueryExpander._get_local_doc_set / backend local set)
+
+Document IDs:
+    100, 1256, 13329, 14368, 14384, 14409, 14418, 14435, 14498, 14556
+    14667, 14845, 1533, 1582, 16276, 16322, 16344, 16392, 16450, 16573
+    16618, 16728, 16809, 16860, 17750, 17821, 17989, 18203, 18306, 18545
+    19633, 19835, 22301, 22308, 24365, 25884, 28414, 31521, 31529, 31535
+    31537, 31555, 31575, 31619, 31769, 34116, 34321, 34540, 6198, 6816
+
+Sample Documents with URLs:
+    [100] https://pubs.usgs.gov/circ/c1050
+    [1256] https://www.usgs.gov/
+    [13329] https://www.usgs.gov/science/science-explorer/biology
+    [14368] https://www.usgs.gov/science/science-explorer/coasts
+    [14384] https://www.usgs.gov/science/science-explorer/climate
+    [14409] https://www.usgs.gov/search?keywords=energy
+    [14418] https://www.usgs.gov/search?keywords=environmental+health
+    [14435] https://www.usgs.gov/search?keywords=geology
+
+Query: "pyroclastic flow danger"
+Query stems (after preprocessing): ['pyroclast', 'flow', 'danger']
+
+Total unique stems in local vocabulary: 1267
+
+Local vocabulary sample (first 80 alphabetical stems):
+    abund, acceler, accept, access, accur, achiev, acquisit, across, act, action
+    activ, adapt, addit, address, adjac, advanc, adventur, advers, advis, advisori
+    affect, age, agenc, agenda, agreement, agricultur, ahead, ahi, ai, aim
+    air, airborn, airplan, alaska, alert, allow, almost, along, also, altern
+    america, american, among, analysi, analyt, analyz, anim, announc, annual, answer
+    antarct, anticip, appli, applic, approach, april, aquadepth, aquat, aquif, archiv
+    area, arizona, arm, aroostook, around, array, art, articl, artifici, arundel
+    asist, ask, aspect, assess, assist, associ, astrogeolog, atlant, attribut, august
+
+Vocabulary statistics:
+    - Total terms in local set: 1267
+    - Alphabetic terms only: 1198
+    - Terms appearing in 2+ local docs: 1267
+
+Formula: S(u,v) = (s_u · s_v) / (|s_u| × |s_v|)
+Where s_u[j] = f(u, doc_j) for doc j in local set (document-frequency vectors on D_l).
+
+
+Query stem 'pyroclast': Not found in local vocabulary
+
+Query stem: 'flow'
+    Association vector norm |s_flow| = 4.1231
+    Appears in 6 local documents
+
+    Candidate Term          Dot Product      |s_v|       S(u,v)
+    -------------------- -------------- ---------- ------------
+    hammond                        8.00       2.24     0.867722
+    variabl                       10.00       2.83     0.857493
+    graviti                        5.00       1.41     0.857493
+    yearli                         5.00       1.41     0.857493
+    glenn                          5.00       1.41     0.857493
+    todd                           5.00       1.41     0.857493
+    caldwel                        5.00       1.41     0.857493
+    melissa                        5.00       1.41     0.857493
+    conu                           5.00       1.41     0.857493
+    dudley                         5.00       1.41     0.857493
+    wieczorek                      5.00       1.41     0.857493
+    lombard                        5.00       1.41     0.857493
+
+Query stem 'danger': Not found in local vocabulary
+
+----------------------------------------
+CLUSTER SELECTION DISCUSSION:
+----------------------------------------
+
+Scalar cosine on document-frequency vectors matches expand_scalar in core.py:
+
+    S(u,v) = Σ_d f(u,d)f(v,d) / (sqrt(Σ_d f(u,d)^2) sqrt(Σ_d f(v,d)^2))
+
+Neighborhoods ranked by cosine are then boosted by expander._score_expansion_term (IDF, etc.).
+
+(4) EXPANDED QUERY AND SEARCH ENGINE RESULTS
+
+Expanded query: pyroclastic flow dangerous caelan
+
+Top 10 results (HITS) on the expanded query:
+
+   1. doc_id=1533 | https://earthquake.usgs.gov/earthquakes/map
+   2. doc_id=100 | https://pubs.usgs.gov/circ/c1050
+   3. doc_id=1256 | https://www.usgs.gov/
+   4. doc_id=1582 | https://www.usgs.gov/science/faqs
+   5. doc_id=14409 | https://www.usgs.gov/search?keywords=energy
+   6. doc_id=14418 | https://www.usgs.gov/search?keywords=environmental+health
+   7. doc_id=14435 | https://www.usgs.gov/search?keywords=geology
+   8. doc_id=14667 | https://www.usgs.gov/search?keywords=information+systems
+   9. doc_id=16618 | https://www.usgs.gov/search?keywords=water
+  10. doc_id=17821 | https://www.usgs.gov/news/news-releases
+
+Report note: Compare these URLs to a HITS run on the original query; discuss whether expansion helped topical precision or introduced drift.
+
+Number of documents: 50
+Method: Top-50 HITS on normalized query 'metamorph gneiss format' (same as QueryExpander._get_local_doc_set / backend local set)
+
+Document IDs:
+    100, 1256, 13329, 14368, 14384, 14409, 14418, 14435, 14498, 14556
+    14667, 14845, 1533, 1582, 16207, 16276, 16322, 16344, 16392, 16450
+    16573, 16618, 16728, 16809, 16860, 16919, 17821, 17989, 18203, 18306
+    18545, 18666, 19633, 22301, 22308, 24365, 28414, 31513, 31529, 31535
+    31537, 31555, 31575, 31619, 31769, 34116, 34321, 34540, 6198, 6262
+
+Sample Documents with URLs:
+    [100] https://pubs.usgs.gov/circ/c1050
+    [1256] https://www.usgs.gov/
+    [13329] https://www.usgs.gov/science/science-explorer/biology
+    [14368] https://www.usgs.gov/science/science-explorer/coasts
+    [14384] https://www.usgs.gov/science/science-explorer/climate
+    [14409] https://www.usgs.gov/search?keywords=energy
+    [14418] https://www.usgs.gov/search?keywords=environmental+health
+    [14435] https://www.usgs.gov/search?keywords=geology
+
+Query: "metamorphic gneiss formation"
+Query stems (after preprocessing): ['metamorph', 'gneiss', 'format']
+
+Total unique stems in local vocabulary: 1320
+
+Local vocabulary sample (first 80 alphabetical stems):
+    abil, abstract, abund, acceler, access, accru, accur, achiev, acquisit, across
+    act, action, activ, adapt, addit, address, adjac, advanc, advantag, advers
+    advis, advisori, affect, age, agenc, agenda, agreement, agricultur, ahead, ahi
+    ai, aim, air, airborn, airplan, ak, alaska, alert, alm, almost
+    along, also, alter, altern, america, american, among, analysi, analyt, analyz
+    anim, announc, annual, anoth, answer, anticip, appli, applic, approach, appropri
+    approxim, april, aquadepth, aquat, aquif, archiv, arctic, area, arizona, arm
+    aroostook, around, array, art, articl, artifici, arundel, asist, ask, aspect
+
+Vocabulary statistics:
+    - Total terms in local set: 1320
+    - Alphabetic terms only: 1249
+    - Terms appearing in 2+ local docs: 1320
+
+Formula: S(u,v) = (s_u · s_v) / (|s_u| × |s_v|)
+Where s_u[j] = f(u, doc_j) for doc j in local set (document-frequency vectors on D_l).
+
+
+Query stem 'metamorph': Not found in local vocabulary
+
+Query stem 'gneiss': Not found in local vocabulary
+
+Query stem: 'format'
+    Association vector norm |s_format| = 12.3288
+    Appears in 5 local documents
+
+    Candidate Term          Dot Product      |s_v|       S(u,v)
+    -------------------- -------------- ---------- ------------
+    scan                          78.00       7.81     0.810043
+    topograph                   1060.00     106.18     0.809703
+    smooth                        41.00       4.12     0.806562
+    custom                       180.00      18.14     0.804920
+    compil                        40.00       4.12     0.786889
+    built                         40.00       4.12     0.786889
+    schedul                       40.00       4.12     0.786889
+    demand                        71.00       7.48     0.769560
+    territori                     40.00       4.36     0.744323
+    transit                       42.00       4.58     0.743392
+    abstract                      20.00       2.24     0.725476
+    chart                         20.00       2.24     0.725476
+
+----------------------------------------
+CLUSTER SELECTION DISCUSSION:
+----------------------------------------
+
+Scalar cosine on document-frequency vectors matches expand_scalar in core.py:
+
+    S(u,v) = Σ_d f(u,d)f(v,d) / (sqrt(Σ_d f(u,d)^2) sqrt(Σ_d f(v,d)^2))
+
+Neighborhoods ranked by cosine are then boosted by expander._score_expansion_term (IDF, etc.).
+
+(4) EXPANDED QUERY AND SEARCH ENGINE RESULTS
+
+Expanded query: metamorphic gneiss formation frye civilian
+
+Top 10 results (HITS) on the expanded query:
+
+   1. doc_id=1533 | https://earthquake.usgs.gov/earthquakes/map
+   2. doc_id=100 | https://pubs.usgs.gov/circ/c1050
+   3. doc_id=1256 | https://www.usgs.gov/
+   4. doc_id=1582 | https://www.usgs.gov/science/faqs
+   5. doc_id=14418 | https://www.usgs.gov/search?keywords=environmental+health
+   6. doc_id=14435 | https://www.usgs.gov/search?keywords=geology
+   7. doc_id=14667 | https://www.usgs.gov/search?keywords=information+systems
+   8. doc_id=16618 | https://www.usgs.gov/search?keywords=water
+   9. doc_id=14409 | https://www.usgs.gov/search?keywords=energy
+  10. doc_id=14556 | https://www.usgs.gov/regions/southwest
+
+Report note: Compare these URLs to a HITS run on the original query; discuss whether expansion helped topical precision or introduced drift.
+
+Number of documents: 50
+Method: Top-50 HITS on normalized query 'groundwat aquif permeabl' (same as QueryExpander._get_local_doc_set / backend local set)
+
+Document IDs:
+    100, 1256, 13329, 14368, 14384, 14409, 14418, 14435, 14498, 14556
+    14667, 14845, 1533, 1582, 16207, 16276, 16322, 16344, 16392, 16450
+    16573, 16618, 16728, 16809, 17750, 17821, 17989, 18203, 18306, 18545
+    18666, 19633, 22308, 24365, 28414, 31521, 31529, 31535, 31537, 31555
+    31575, 31585, 31619, 31769, 34116, 34321, 34540, 6198, 6262, 6816
+
+Sample Documents with URLs:
+    [100] https://pubs.usgs.gov/circ/c1050
+    [1256] https://www.usgs.gov/
+    [13329] https://www.usgs.gov/science/science-explorer/biology
+    [14368] https://www.usgs.gov/science/science-explorer/coasts
+    [14384] https://www.usgs.gov/science/science-explorer/climate
+    [14409] https://www.usgs.gov/search?keywords=energy
+    [14418] https://www.usgs.gov/search?keywords=environmental+health
+    [14435] https://www.usgs.gov/search?keywords=geology
+
+Query: "groundwater aquifer permeability"
+Query stems (after preprocessing): ['groundwat', 'aquif', 'permeabl']
+
+Total unique stems in local vocabulary: 1259
+
+Local vocabulary sample (first 80 alphabetical stems):
+    abstract, abund, access, accur, acquisit, across, act, action, activ, adapt
+    addit, address, adjac, advanc, advers, advis, advisori, affect, age, agenc
+    agenda, agreement, agricultur, ahead, ahi, ai, airborn, airplan, ak, alaska
+    alert, allow, almost, along, also, alter, america, american, among, analysi
+    analyt, analyz, anim, announc, annual, answer, anticip, applic, approach, appropri
+    approxim, april, aquadepth, aquat, aquif, archiv, arctic, area, arizona, arm
+    aroostook, around, array, art, articl, artifici, arundel, ask, aspect, assess
+    assist, associ, astrogeolog, atlant, attribut, august, australia, author, authorit, autom
+
+Vocabulary statistics:
+    - Total terms in local set: 1259
+    - Alphabetic terms only: 1193
+    - Terms appearing in 2+ local docs: 1259
+
+Formula: S(u,v) = (s_u · s_v) / (|s_u| × |s_v|)
+Where s_u[j] = f(u, doc_j) for doc j in local set (document-frequency vectors on D_l).
+
+
+Query stem: 'groundwat'
+    Association vector norm |s_groundwat| = 9.8995
+    Appears in 8 local documents
+
+    Candidate Term          Dot Product      |s_v|       S(u,v)
+    -------------------- -------------- ---------- ------------
+    variabl                       24.00       2.83     0.857143
+    graviti                       12.00       1.41     0.857143
+    metric                        12.00       1.41     0.857143
+    contermin                     12.00       1.41     0.857143
+    yearli                        12.00       1.41     0.857143
+    glenn                         12.00       1.41     0.857143
+    todd                          12.00       1.41     0.857143
+    caldwel                       12.00       1.41     0.857143
+    melissa                       12.00       1.41     0.857143
+    conu                          12.00       1.41     0.857143
+    dudley                        12.00       1.41     0.857143
+    wieczorek                     12.00       1.41     0.857143
+
+Query stem: 'aquif'
+    Association vector norm |s_aquif| = 4.3589
+    Appears in 5 local documents
+
+    Candidate Term          Dot Product      |s_v|       S(u,v)
+    -------------------- -------------- ---------- ------------
+    subsurfac                      7.00       2.24     0.718185
+    freshwat                      18.00       6.08     0.678883
+    cold                           9.00       3.16     0.652929
+    midwestern                     8.00       2.83     0.648886
+    roosevelt                      4.00       1.41     0.648886
+    iowa                           4.00       1.41     0.648886
+    curri                          4.00       1.41     0.648886
+    biogeochem                     4.00       1.41     0.648886
+    missouri                       4.00       1.41     0.648886
+    aroostook                      4.00       1.41     0.648886
+    parmer                         4.00       1.41     0.648886
+    northeastern                  14.00       5.00     0.642364
+
+Query stem 'permeabl': Not found in local vocabulary
+
+----------------------------------------
+CLUSTER SELECTION DISCUSSION:
+----------------------------------------
+
+Scalar cosine on document-frequency vectors matches expand_scalar in core.py:
+
+    S(u,v) = Σ_d f(u,d)f(v,d) / (sqrt(Σ_d f(u,d)^2) sqrt(Σ_d f(v,d)^2))
+
+Neighborhoods ranked by cosine are then boosted by expander._score_expansion_term (IDF, etc.).
+
+(4) EXPANDED QUERY AND SEARCH ENGINE RESULTS
+
+Expanded query: groundwater aquifer permeability caelan
+
+Top 10 results (HITS) on the expanded query:
+
+   1. doc_id=1533 | https://earthquake.usgs.gov/earthquakes/map
+   2. doc_id=100 | https://pubs.usgs.gov/circ/c1050
+   3. doc_id=1256 | https://www.usgs.gov/
+   4. doc_id=1582 | https://www.usgs.gov/science/faqs
+   5. doc_id=14418 | https://www.usgs.gov/search?keywords=environmental+health
+   6. doc_id=14435 | https://www.usgs.gov/search?keywords=geology
+   7. doc_id=14667 | https://www.usgs.gov/search?keywords=information+systems
+   8. doc_id=14409 | https://www.usgs.gov/search?keywords=energy
+   9. doc_id=16618 | https://www.usgs.gov/search?keywords=water
+  10. doc_id=18203 | https://www.usgs.gov/regions/northeast-region
+
+Report note: Compare these URLs to a HITS run on the original query; discuss whether expansion helped topical precision or introduced drift.

@@ -1,0 +1,19 @@
+Query: "metamorphic gneiss formation"
+Query stems (after preprocessing): ['metamorph', 'gneiss', 'format']
+
+Total unique stems in local vocabulary: 1320
+
+Local vocabulary sample (first 80 alphabetical stems):
+    abil, abstract, abund, acceler, access, accru, accur, achiev, acquisit, across
+    act, action, activ, adapt, addit, address, adjac, advanc, advantag, advers
+    advis, advisori, affect, age, agenc, agenda, agreement, agricultur, ahead, ahi
+    ai, aim, air, airborn, airplan, ak, alaska, alert, alm, almost
+    along, also, alter, altern, america, american, among, analysi, analyt, analyz
+    anim, announc, annual, anoth, answer, anticip, appli, applic, approach, appropri
+    approxim, april, aquadepth, aquat, aquif, archiv, arctic, area, arizona, arm
+    aroostook, around, array, art, articl, artifici, arundel, asist, ask, aspect
+
+Vocabulary statistics:
+    - Total terms in local set: 1320
+    - Alphabetic terms only: 1249
+    - Terms appearing in 2+ local docs: 1320

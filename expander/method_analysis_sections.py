@@ -25,6 +25,7 @@ def local_analysis_context(
         "query_stems": query_stems,
         "local_doc_ids": local_doc_ids,
         "sorted_ids": sorted_ids,
+        "local_top_k": top_k,
         "local_tf": local_tf,
         "engine": engine,
         "expander": expander,
@@ -36,10 +37,12 @@ def format_lds_section(ctx: dict[str, Any]) -> str:
     local_doc_ids_sorted = ctx["sorted_ids"]
     normalized_query = ctx["normalized_query"]
     local_doc_ids = ctx["local_doc_ids"]
+    top_k = int(ctx.get("local_top_k", 50))
     lines: list[str] = []
     lines.append(f"Number of documents: {len(local_doc_ids_sorted)}")
     lines.append(
-        f"Method: Top-50 BM25 results for normalized query '{normalized_query}'"
+        f"Method: Top-{top_k} HITS on normalized query '{normalized_query}' "
+        f"(same as QueryExpander._get_local_doc_set / backend local set)"
     )
     lines.append("")
     lines.append("Document IDs:")
@@ -290,4 +293,33 @@ def format_metric_correlations(ctx: dict[str, Any], expander: Any) -> str:
 Proximity on preprocess(text_preview) matches expand_metric in core.py: inverse word distance summed
 within each snippet, gated by expander._is_candidate_term before IDF boosting and final lemmas.
 """)
+    return "\n".join(lines)
+
+
+def format_expansion_section(
+    engine: Any,
+    expanded_query: str,
+    search_method: str = "hits",
+    top_k: int = 10,
+) -> str:
+    """Rubric item: expanded query string + ranked results for X3-style display."""
+    lines: list[str] = []
+    lines.append("(4) EXPANDED QUERY AND SEARCH ENGINE RESULTS")
+    lines.append("")
+    lines.append(f"Expanded query: {expanded_query}")
+    lines.append("")
+    lines.append(f"Top {top_k} results ({search_method.upper()}) on the expanded query:")
+    lines.append("")
+    results = engine.search(expanded_query, method=search_method, top_k=top_k)
+    if not results:
+        lines.append("  [no results]")
+    else:
+        for r in results:
+            url = r.get("url", "N/A")
+            lines.append(f"  {r['rank']:>2}. doc_id={r['doc_id']} | {url}")
+    lines.append("")
+    lines.append(
+        "Report note: Compare these URLs to a HITS run on the original query; discuss "
+        "whether expansion helped topical precision or introduced drift."
+    )
     return "\n".join(lines)

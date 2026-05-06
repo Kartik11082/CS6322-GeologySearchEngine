@@ -1,0 +1,36 @@
+Formula: S(u,v) = (s_u · s_v) / (|s_u| × |s_v|)
+Where s_u[j] = f(u, doc_j) for doc j in local set (document-frequency vectors on D_l).
+
+
+Query stem 'metamorph': Not found in local vocabulary
+
+Query stem 'gneiss': Not found in local vocabulary
+
+Query stem: 'format'
+    Association vector norm |s_format| = 12.3288
+    Appears in 5 local documents
+
+    Candidate Term          Dot Product      |s_v|       S(u,v)
+    -------------------- -------------- ---------- ------------
+    scan                          78.00       7.81     0.810043
+    topograph                   1060.00     106.18     0.809703
+    smooth                        41.00       4.12     0.806562
+    custom                       180.00      18.14     0.804920
+    compil                        40.00       4.12     0.786889
+    built                         40.00       4.12     0.786889
+    schedul                       40.00       4.12     0.786889
+    demand                        71.00       7.48     0.769560
+    territori                     40.00       4.36     0.744323
+    transit                       42.00       4.58     0.743392
+    abstract                      20.00       2.24     0.725476
+    chart                         20.00       2.24     0.725476
+
+----------------------------------------
+CLUSTER SELECTION DISCUSSION:
+----------------------------------------
+
+Scalar cosine on document-frequency vectors matches expand_scalar in core.py:
+
+    S(u,v) = Σ_d f(u,d)f(v,d) / (sqrt(Σ_d f(u,d)^2) sqrt(Σ_d f(v,d)^2))
+
+Neighborhoods ranked by cosine are then boosted by expander._score_expansion_term (IDF, etc.).

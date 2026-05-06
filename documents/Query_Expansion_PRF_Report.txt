@@ -1,0 +1,830 @@
+================================================================================
+CS6322 — GEOLOGY SEARCH ENGINE
+SECTION 6 STYLE REPORT: PSEUDO RELEVANCE FEEDBACK (THREE LOCAL METHODS)
+Author: Uddesh Singh | NetID: UXS230004
+================================================================================
+Each block below follows this order: Local Document Set → Original Query →
+Documents with URLs → Query Term Correlation → Local Vocabulary Set →
+Expanded Query → Top 10 results (HITS) on the expanded query.
+
+Source artifacts: expander/textfiles/Associative|Metric|Scalar/q{1,2,3}_*.txt
+(computed with QueryExpander local pool = top 50 HITS on normalized query).
+
+
+################################################################################
+METHOD A — ASSOCIATIVE CLUSTERING (normalized co-occurrence on D_l)
+Formula: C(u,v) = Σ_j f(u,j)f(v,j); normalized by Σf(u)·Σf(v). Implementation:
+expander/core.py expand_association().
+################################################################################
+
+
+────────────────────────────────────────────────────────────────────────────────
+SUB-QUERY A1
+────────────────────────────────────────────────────────────────────────────────
+
+Local Document Set:
+    Number of documents: 50
+    Method: Top-50 HITS on normalized query 'pyroclast flow danger'
+    Document IDs:
+        100, 1256, 13329, 14368, 14384, 14409, 14418, 14435, 14498, 14556
+        14667, 14845, 1533, 1582, 16276, 16322, 16344, 16392, 16450, 16573
+        16618, 16728, 16809, 16860, 17750, 17821, 17989, 18203, 18306, 18545
+        19633, 19835, 22301, 22308, 24365, 25884, 28414, 31521, 31529, 31535
+        31537, 31555, 31575, 31619, 31769, 34116, 34321, 34540, 6198, 6816
+
+Original Query:
+    pyroclastic flow danger
+
+Documents with URLs:
+    [100] https://pubs.usgs.gov/circ/c1050
+    [1256] https://www.usgs.gov/
+    [13329] https://www.usgs.gov/science/science-explorer/biology
+    [14368] https://www.usgs.gov/science/science-explorer/coasts
+    [14384] https://www.usgs.gov/science/science-explorer/climate
+    [14409] https://www.usgs.gov/search?keywords=energy
+    [14418] https://www.usgs.gov/search?keywords=environmental+health
+    [14435] https://www.usgs.gov/search?keywords=geology
+
+Query Term Correlation:
+    Formula: C(u,v) = Σ [f(u,j) × f(v,j)] for all docs j in local set
+    Normalized by: C(u,v) / (Σf(u) × Σf(v))
+
+    Query stem 'pyroclast': Not found in local vocabulary
+
+    Query stem: 'flow'
+        Frequency sum Σf(flow) = 9
+        Appears in 6 local documents
+
+        Candidate Term         Raw C(u,v)   Normalized
+        -------------------- ------------ ------------
+        hammond                      8.00     0.296296
+        variabl                     10.00     0.277778
+        graviti                      5.00     0.277778
+        radar                       10.00     0.277778
+        yearli                       5.00     0.277778
+        glenn                        5.00     0.277778
+        todd                         5.00     0.277778
+        caldwel                      5.00     0.277778
+        melissa                      5.00     0.277778
+        conu                         5.00     0.277778
+        dudley                       5.00     0.277778
+        wieczorek                    5.00     0.277778
+
+    Query stem 'danger': Not found in local vocabulary
+
+    Cluster selection: Normalized co-occurrence ranks neighbors per query stem;
+    expand_association applies _is_candidate_term, IDF via _score_expansion_term,
+    merges neighbors in _finalize_expansion.
+
+Local Vocabulary Set:
+    Query stems (after preprocessing): ['pyroclast', 'flow', 'danger']
+    Total unique stems in local vocabulary: 1267
+    Alphabetic terms only: 1198
+    Terms appearing in 2+ local docs: 1267
+
+    Local vocabulary sample (first 80 alphabetical stems):
+        abund, acceler, accept, access, accur, achiev, acquisit, across, act, action
+        activ, adapt, addit, address, adjac, advanc, adventur, advers, advis, advisori
+        affect, age, agenc, agenda, agreement, agricultur, ahead, ahi, ai, aim
+        air, airborn, airplan, alaska, alert, allow, almost, along, also, altern
+        america, american, among, analysi, analyt, analyz, anim, announc, annual, answer
+        antarct, anticip, appli, applic, approach, april, aquadepth, aquat, aquif, archiv
+        area, arizona, arm, aroostook, around, array, art, articl, artifici, arundel
+        asist, ask, aspect, assess, assist, associ, astrogeolog, atlant, attribut, august
+
+Expanded Query:
+    pyroclastic flow dangerous caelan
+
+Top 10 results (HITS) on the expanded query:
+    1. doc_id=1533 | https://earthquake.usgs.gov/earthquakes/map
+    2. doc_id=100 | https://pubs.usgs.gov/circ/c1050
+    3. doc_id=1256 | https://www.usgs.gov/
+    4. doc_id=1582 | https://www.usgs.gov/science/faqs
+    5. doc_id=14409 | https://www.usgs.gov/search?keywords=energy
+    6. doc_id=14418 | https://www.usgs.gov/search?keywords=environmental+health
+    7. doc_id=14435 | https://www.usgs.gov/search?keywords=geology
+    8. doc_id=14667 | https://www.usgs.gov/search?keywords=information+systems
+    9. doc_id=16618 | https://www.usgs.gov/search?keywords=water
+   10. doc_id=17821 | https://www.usgs.gov/news/news-releases
+
+
+────────────────────────────────────────────────────────────────────────────────
+SUB-QUERY A2
+────────────────────────────────────────────────────────────────────────────────
+
+Local Document Set:
+    Number of documents: 50
+    Method: Top-50 HITS on normalized query 'metamorph gneiss format'
+    Document IDs:
+        100, 1256, 13329, 14368, 14384, 14409, 14418, 14435, 14498, 14556
+        14667, 14845, 1533, 1582, 16207, 16276, 16322, 16344, 16392, 16450
+        16573, 16618, 16728, 16809, 16860, 16919, 17821, 17989, 18203, 18306
+        18545, 18666, 19633, 22301, 22308, 24365, 28414, 31513, 31529, 31535
+        31537, 31555, 31575, 31619, 31769, 34116, 34321, 34540, 6198, 6262
+
+Original Query:
+    metamorphic gneiss formation
+
+Documents with URLs:
+    [100] https://pubs.usgs.gov/circ/c1050
+    [1256] https://www.usgs.gov/
+    [13329] https://www.usgs.gov/science/science-explorer/biology
+    [14368] https://www.usgs.gov/science/science-explorer/coasts
+    [14384] https://www.usgs.gov/science/science-explorer/climate
+    [14409] https://www.usgs.gov/search?keywords=energy
+    [14418] https://www.usgs.gov/search?keywords=environmental+health
+    [14435] https://www.usgs.gov/search?keywords=geology
+
+Query Term Correlation:
+    Formula: C(u,v) = Σ [f(u,j) × f(v,j)] for all docs j in local set
+    Normalized by: C(u,v) / (Σf(u) × Σf(v))
+
+    Query stem 'metamorph': Not found in local vocabulary
+    Query stem 'gneiss': Not found in local vocabulary
+
+    Query stem: 'format'
+        Frequency sum Σf(format) = 20
+        Appears in 5 local documents
+
+        Candidate Term         Raw C(u,v)   Normalized
+        -------------------- ------------ ------------
+        topograph                 1060.00     0.445378
+        custom                     180.00     0.428571
+        smooth                      41.00     0.410000
+        compil                      40.00     0.400000
+        built                       40.00     0.400000
+        schedul                     40.00     0.400000
+        abstract                    20.00     0.333333
+        chart                       20.00     0.333333
+        tradit                      40.00     0.333333
+        trail                       20.00     0.333333
+        frye                        20.00     0.333333
+        transit                     42.00     0.300000
+
+    Cluster selection: Normalized co-occurrence ranks neighbors per query stem;
+    expand_association applies _is_candidate_term, IDF via _score_expansion_term,
+    merges neighbors in _finalize_expansion.
+
+Local Vocabulary Set:
+    Query stems (after preprocessing): ['metamorph', 'gneiss', 'format']
+    Total unique stems in local vocabulary: 1320
+    Alphabetic terms only: 1249
+    Terms appearing in 2+ local docs: 1320
+
+    Local vocabulary sample (first 80 alphabetical stems):
+        abil, abstract, abund, acceler, access, accru, accur, achiev, acquisit, across
+        act, action, activ, adapt, addit, address, adjac, advanc, advantag, advers
+        advis, advisori, affect, age, agenc, agenda, agreement, agricultur, ahead, ahi
+        ai, aim, air, airborn, airplan, ak, alaska, alert, alm, almost
+        along, also, alter, altern, america, american, among, analysi, analyt, analyz
+        anim, announc, annual, anoth, answer, anticip, appli, applic, approach, appropri
+        approxim, april, aquadepth, aquat, aquif, archiv, arctic, area, arizona, arm
+        aroostook, around, array, art, articl, artifici, arundel, asist, ask, aspect
+
+Expanded Query:
+    metamorphic gneiss formation frye smooth
+
+Top 10 results (HITS) on the expanded query:
+    1. doc_id=1533 | https://earthquake.usgs.gov/earthquakes/map
+    2. doc_id=100 | https://pubs.usgs.gov/circ/c1050
+    3. doc_id=1256 | https://www.usgs.gov/
+    4. doc_id=1582 | https://www.usgs.gov/science/faqs
+    5. doc_id=14418 | https://www.usgs.gov/search?keywords=environmental+health
+    6. doc_id=14435 | https://www.usgs.gov/search?keywords=geology
+    7. doc_id=14667 | https://www.usgs.gov/search?keywords=information+systems
+    8. doc_id=16618 | https://www.usgs.gov/search?keywords=water
+    9. doc_id=14409 | https://www.usgs.gov/search?keywords=energy
+   10. doc_id=14556 | https://www.usgs.gov/regions/southwest
+
+
+────────────────────────────────────────────────────────────────────────────────
+SUB-QUERY A3
+────────────────────────────────────────────────────────────────────────────────
+
+Local Document Set:
+    Number of documents: 50
+    Method: Top-50 HITS on normalized query 'groundwat aquif permeabl'
+    Document IDs:
+        100, 1256, 13329, 14368, 14384, 14409, 14418, 14435, 14498, 14556
+        14667, 14845, 1533, 1582, 16207, 16276, 16322, 16344, 16392, 16450
+        16573, 16618, 16728, 16809, 17750, 17821, 17989, 18203, 18306, 18545
+        18666, 19633, 22308, 24365, 28414, 31521, 31529, 31535, 31537, 31555
+        31575, 31585, 31619, 31769, 34116, 34321, 34540, 6198, 6262, 6816
+
+Original Query:
+    groundwater aquifer permeability
+
+Documents with URLs:
+    [100] https://pubs.usgs.gov/circ/c1050
+    [1256] https://www.usgs.gov/
+    [13329] https://www.usgs.gov/science/science-explorer/biology
+    [14368] https://www.usgs.gov/science/science-explorer/coasts
+    [14384] https://www.usgs.gov/science/science-explorer/climate
+    [14409] https://www.usgs.gov/search?keywords=energy
+    [14418] https://www.usgs.gov/search?keywords=environmental+health
+    [14435] https://www.usgs.gov/search?keywords=geology
+
+Query Term Correlation:
+    Formula: C(u,v) = Σ [f(u,j) × f(v,j)] for all docs j in local set
+    Normalized by: C(u,v) / (Σf(u) × Σf(v))
+
+    Query stem: 'groundwat'
+        Frequency sum Σf(groundwat) = 24
+        Appears in 8 local documents
+
+        Candidate Term         Raw C(u,v)   Normalized
+        -------------------- ------------ ------------
+        variabl                     24.00     0.250000
+        graviti                     12.00     0.250000
+        metric                      12.00     0.250000
+        england                     36.00     0.250000
+        contermin                   12.00     0.250000
+        yearli                      12.00     0.250000
+        glenn                       12.00     0.250000
+        todd                        12.00     0.250000
+        caldwel                     12.00     0.250000
+        melissa                     12.00     0.250000
+        conu                        12.00     0.250000
+        hammond                     18.00     0.250000
+
+    Query stem: 'aquif'
+        Frequency sum Σf(aquif) = 9
+        Appears in 5 local documents
+
+        Candidate Term         Raw C(u,v)   Normalized
+        -------------------- ------------ ------------
+        freshwat                    18.00     0.285714
+        subsurfac                    7.00     0.259259
+        cold                         9.00     0.250000
+        soon                         8.00     0.222222
+        airborn                      8.00     0.222222
+        alter                        6.00     0.222222
+        task                         6.00     0.222222
+        midwestern                   8.00     0.222222
+        northeastern                14.00     0.222222
+        slope                        6.00     0.222222
+        roosevelt                    4.00     0.222222
+        iowa                         4.00     0.222222
+
+    Query stem 'permeabl': Not found in local vocabulary
+
+    Cluster selection: Normalized co-occurrence ranks neighbors per query stem;
+    expand_association applies _is_candidate_term, IDF via _score_expansion_term,
+    merges neighbors in _finalize_expansion.
+
+Local Vocabulary Set:
+    Query stems (after preprocessing): ['groundwat', 'aquif', 'permeabl']
+    Total unique stems in local vocabulary: 1259
+    Alphabetic terms only: 1193
+    Terms appearing in 2+ local docs: 1259
+
+    Local vocabulary sample (first 80 alphabetical stems):
+        abstract, abund, access, accur, acquisit, across, act, action, activ, adapt
+        addit, address, adjac, advanc, advers, advis, advisori, affect, age, agenc
+        agenda, agreement, agricultur, ahead, ahi, ai, airborn, airplan, ak, alaska
+        alert, allow, almost, along, also, alter, america, american, among, analysi
+        analyt, analyz, anim, announc, annual, answer, anticip, applic, approach, appropri
+        approxim, april, aquadepth, aquat, aquif, archiv, arctic, area, arizona, arm
+        aroostook, around, array, art, articl, artifici, arundel, ask, aspect, assess
+        assist, associ, astrogeolog, atlant, attribut, august, australia, author, authorit, autom
+
+Expanded Query:
+    groundwater aquifer permeability caelan
+
+Top 10 results (HITS) on the expanded query:
+    1. doc_id=1533 | https://earthquake.usgs.gov/earthquakes/map
+    2. doc_id=100 | https://pubs.usgs.gov/circ/c1050
+    3. doc_id=1256 | https://www.usgs.gov/
+    4. doc_id=1582 | https://www.usgs.gov/science/faqs
+    5. doc_id=14418 | https://www.usgs.gov/search?keywords=environmental+health
+    6. doc_id=14435 | https://www.usgs.gov/search?keywords=geology
+    7. doc_id=14667 | https://www.usgs.gov/search?keywords=information+systems
+    8. doc_id=14409 | https://www.usgs.gov/search?keywords=energy
+    9. doc_id=16618 | https://www.usgs.gov/search?keywords=water
+   10. doc_id=18203 | https://www.usgs.gov/regions/northeast-region
+
+
+################################################################################
+METHOD B — METRIC CLUSTERING (inverse word distance in text_preview)
+Formula: C(u,v) = Σ 1/|pos(u)−pos(v)| over documents and position pairs.
+Implementation: expander/core.py expand_metric().
+################################################################################
+
+
+────────────────────────────────────────────────────────────────────────────────
+SUB-QUERY B1
+────────────────────────────────────────────────────────────────────────────────
+
+Local Document Set:
+    Number of documents: 50
+    Method: Top-50 HITS on normalized query 'pyroclast flow danger'
+    Document IDs:
+        100, 1256, 13329, 14368, 14384, 14409, 14418, 14435, 14498, 14556
+        14667, 14845, 1533, 1582, 16276, 16322, 16344, 16392, 16450, 16573
+        16618, 16728, 16809, 16860, 17750, 17821, 17989, 18203, 18306, 18545
+        19633, 19835, 22301, 22308, 24365, 25884, 28414, 31521, 31529, 31535
+        31537, 31555, 31575, 31619, 31769, 34116, 34321, 34540, 6198, 6816
+
+Original Query:
+    pyroclastic flow danger
+
+Documents with URLs:
+    [100] https://pubs.usgs.gov/circ/c1050
+    [1256] https://www.usgs.gov/
+    [13329] https://www.usgs.gov/science/science-explorer/biology
+    [14368] https://www.usgs.gov/science/science-explorer/coasts
+    [14384] https://www.usgs.gov/science/science-explorer/climate
+    [14409] https://www.usgs.gov/search?keywords=energy
+    [14418] https://www.usgs.gov/search?keywords=environmental+health
+    [14435] https://www.usgs.gov/search?keywords=geology
+
+Query Term Correlation:
+    Formula: C(u,v) = Σ [1 / |pos(u) - pos(v)|]
+    Summed across all documents and position pairs.
+    Documents with position data: 50
+
+    Query stem 'pyroclast': No position data found
+
+    Query stem: 'flow'
+        Co-located with 4 candidate terms
+
+        Candidate Term         Σ(1/distance) Interpretation
+        -------------------- --------------- ------------------------------
+        smoki                       1.000000 Distant
+        restor                      0.142857 Distant
+        everglad                    0.100000 Distant
+        organiz                     0.043478 Distant
+
+    Query stem 'danger': No position data found
+
+    Cluster selection: Proximity on preprocess(text_preview); gated by
+    _is_candidate_term; IDF boosting and lemma display per expand_metric.
+
+Local Vocabulary Set:
+    Query stems (after preprocessing): ['pyroclast', 'flow', 'danger']
+    Total unique stems in local vocabulary: 1267
+    Alphabetic terms only: 1198
+    Terms appearing in 2+ local docs: 1267
+
+    Local vocabulary sample (first 80 alphabetical stems):
+        abund, acceler, accept, access, accur, achiev, acquisit, across, act, action
+        activ, adapt, addit, address, adjac, advanc, adventur, advers, advis, advisori
+        affect, age, agenc, agenda, agreement, agricultur, ahead, ahi, ai, aim
+        air, airborn, airplan, alaska, alert, allow, almost, along, also, altern
+        america, american, among, analysi, analyt, analyz, anim, announc, annual, answer
+        antarct, anticip, appli, applic, approach, april, aquadepth, aquat, aquif, archiv
+        area, arizona, arm, aroostook, around, array, art, articl, artifici, arundel
+        asist, ask, aspect, assess, assist, associ, astrogeolog, atlant, attribut, august
+
+Expanded Query:
+    pyroclastic flow dangerous smoky restoration
+
+Top 10 results (HITS) on the expanded query:
+    1. doc_id=1533 | https://earthquake.usgs.gov/earthquakes/map
+    2. doc_id=100 | https://pubs.usgs.gov/circ/c1050
+    3. doc_id=1582 | https://www.usgs.gov/science/faqs
+    4. doc_id=1256 | https://www.usgs.gov/
+    5. doc_id=14667 | https://www.usgs.gov/search?keywords=information+systems
+    6. doc_id=14409 | https://www.usgs.gov/search?keywords=energy
+    7. doc_id=14418 | https://www.usgs.gov/search?keywords=environmental+health
+    8. doc_id=14435 | https://www.usgs.gov/search?keywords=geology
+    9. doc_id=16618 | https://www.usgs.gov/search?keywords=water
+   10. doc_id=17821 | https://www.usgs.gov/news/news-releases
+
+
+────────────────────────────────────────────────────────────────────────────────
+SUB-QUERY B2
+────────────────────────────────────────────────────────────────────────────────
+
+Local Document Set:
+    Number of documents: 50
+    Method: Top-50 HITS on normalized query 'metamorph gneiss format'
+    Document IDs:
+        100, 1256, 13329, 14368, 14384, 14409, 14418, 14435, 14498, 14556
+        14667, 14845, 1533, 1582, 16207, 16276, 16322, 16344, 16392, 16450
+        16573, 16618, 16728, 16809, 16860, 16919, 17821, 17989, 18203, 18306
+        18545, 18666, 19633, 22301, 22308, 24365, 28414, 31513, 31529, 31535
+        31537, 31555, 31575, 31619, 31769, 34116, 34321, 34540, 6198, 6262
+
+Original Query:
+    metamorphic gneiss formation
+
+Documents with URLs:
+    [100] https://pubs.usgs.gov/circ/c1050
+    [1256] https://www.usgs.gov/
+    [13329] https://www.usgs.gov/science/science-explorer/biology
+    [14368] https://www.usgs.gov/science/science-explorer/coasts
+    [14384] https://www.usgs.gov/science/science-explorer/climate
+    [14409] https://www.usgs.gov/search?keywords=energy
+    [14418] https://www.usgs.gov/search?keywords=environmental+health
+    [14435] https://www.usgs.gov/search?keywords=geology
+
+Query Term Correlation:
+    Formula: C(u,v) = Σ [1 / |pos(u) - pos(v)|]
+    Summed across all documents and position pairs.
+    Documents with position data: 50
+
+    Query stem 'metamorph': No position data found
+    Query stem 'gneiss': No position data found
+    Query stem 'format': No position data found
+
+    Cluster selection: With no qualifying proximity hits for these stems in
+    text_preview, metric expansion adds no new terms; expanded query equals the
+    normalized surface form of the original.
+
+Local Vocabulary Set:
+    Query stems (after preprocessing): ['metamorph', 'gneiss', 'format']
+    Total unique stems in local vocabulary: 1320
+    Alphabetic terms only: 1249
+    Terms appearing in 2+ local docs: 1320
+
+    Local vocabulary sample (first 80 alphabetical stems):
+        abil, abstract, abund, acceler, access, accru, accur, achiev, acquisit, across
+        act, action, activ, adapt, addit, address, adjac, advanc, advantag, advers
+        advis, advisori, affect, age, agenc, agenda, agreement, agricultur, ahead, ahi
+        ai, aim, air, airborn, airplan, ak, alaska, alert, alm, almost
+        along, also, alter, altern, america, american, among, analysi, analyt, analyz
+        anim, announc, annual, anoth, answer, anticip, appli, applic, approach, appropri
+        approxim, april, aquadepth, aquat, aquif, archiv, arctic, area, arizona, arm
+        aroostook, around, array, art, articl, artifici, arundel, asist, ask, aspect
+
+Expanded Query:
+    metamorphic gneiss formation
+
+Top 10 results (HITS) on the expanded query:
+    1. doc_id=1533 | https://earthquake.usgs.gov/earthquakes/map
+    2. doc_id=100 | https://pubs.usgs.gov/circ/c1050
+    3. doc_id=1256 | https://www.usgs.gov/
+    4. doc_id=1582 | https://www.usgs.gov/science/faqs
+    5. doc_id=14418 | https://www.usgs.gov/search?keywords=environmental+health
+    6. doc_id=14435 | https://www.usgs.gov/search?keywords=geology
+    7. doc_id=14667 | https://www.usgs.gov/search?keywords=information+systems
+    8. doc_id=16618 | https://www.usgs.gov/search?keywords=water
+    9. doc_id=14409 | https://www.usgs.gov/search?keywords=energy
+   10. doc_id=14556 | https://www.usgs.gov/regions/southwest
+
+
+────────────────────────────────────────────────────────────────────────────────
+SUB-QUERY B3
+────────────────────────────────────────────────────────────────────────────────
+
+Local Document Set:
+    Number of documents: 50
+    Method: Top-50 HITS on normalized query 'groundwat aquif permeabl'
+    Document IDs:
+        100, 1256, 13329, 14368, 14384, 14409, 14418, 14435, 14498, 14556
+        14667, 14845, 1533, 1582, 16207, 16276, 16322, 16344, 16392, 16450
+        16573, 16618, 16728, 16809, 17750, 17821, 17989, 18203, 18306, 18545
+        18666, 19633, 22308, 24365, 28414, 31521, 31529, 31535, 31537, 31555
+        31575, 31585, 31619, 31769, 34116, 34321, 34540, 6198, 6262, 6816
+
+Original Query:
+    groundwater aquifer permeability
+
+Documents with URLs:
+    [100] https://pubs.usgs.gov/circ/c1050
+    [1256] https://www.usgs.gov/
+    [13329] https://www.usgs.gov/science/science-explorer/biology
+    [14368] https://www.usgs.gov/science/science-explorer/coasts
+    [14384] https://www.usgs.gov/science/science-explorer/climate
+    [14409] https://www.usgs.gov/search?keywords=energy
+    [14418] https://www.usgs.gov/search?keywords=environmental+health
+    [14435] https://www.usgs.gov/search?keywords=geology
+
+Query Term Correlation:
+    Formula: C(u,v) = Σ [1 / |pos(u) - pos(v)|]
+    Summed across all documents and position pairs.
+    Documents with position data: 50
+
+    Query stem 'groundwat': No position data found
+    Query stem 'aquif': No position data found
+    Query stem 'permeabl': No position data found
+
+    Cluster selection: No proximity-based neighbors for these stems in
+    text_preview under the metric; expansion does not add terms.
+
+Local Vocabulary Set:
+    Query stems (after preprocessing): ['groundwat', 'aquif', 'permeabl']
+    Total unique stems in local vocabulary: 1259
+    Alphabetic terms only: 1193
+    Terms appearing in 2+ local docs: 1259
+
+    Local vocabulary sample (first 80 alphabetical stems):
+        abstract, abund, access, accur, acquisit, across, act, action, activ, adapt
+        addit, address, adjac, advanc, advers, advis, advisori, affect, age, agenc
+        agenda, agreement, agricultur, ahead, ahi, ai, airborn, airplan, ak, alaska
+        alert, allow, almost, along, also, alter, america, american, among, analysi
+        analyt, analyz, anim, announc, annual, answer, anticip, applic, approach, appropri
+        approxim, april, aquadepth, aquat, aquif, archiv, arctic, area, arizona, arm
+        aroostook, around, array, art, articl, artifici, arundel, ask, aspect, assess
+        assist, associ, astrogeolog, atlant, attribut, august, australia, author, authorit, autom
+
+Expanded Query:
+    groundwater aquifer permeability
+
+Top 10 results (HITS) on the expanded query:
+    1. doc_id=1533 | https://earthquake.usgs.gov/earthquakes/map
+    2. doc_id=100 | https://pubs.usgs.gov/circ/c1050
+    3. doc_id=1256 | https://www.usgs.gov/
+    4. doc_id=1582 | https://www.usgs.gov/science/faqs
+    5. doc_id=14418 | https://www.usgs.gov/search?keywords=environmental+health
+    6. doc_id=14435 | https://www.usgs.gov/search?keywords=geology
+    7. doc_id=14667 | https://www.usgs.gov/search?keywords=information+systems
+    8. doc_id=14409 | https://www.usgs.gov/search?keywords=energy
+    9. doc_id=16618 | https://www.usgs.gov/search?keywords=water
+   10. doc_id=18203 | https://www.usgs.gov/regions/northeast-region
+
+
+################################################################################
+METHOD C — SCALAR CLUSTERING (cosine on document-frequency vectors over D_l)
+Formula: S(u,v) = (s_u · s_v) / (|s_u| × |s_v|), s_u[j] = f(u, doc_j).
+Implementation: expander/scalar_association_math.py + expand_scalar().
+################################################################################
+
+
+────────────────────────────────────────────────────────────────────────────────
+SUB-QUERY C1
+────────────────────────────────────────────────────────────────────────────────
+
+Local Document Set:
+    Number of documents: 50
+    Method: Top-50 HITS on normalized query 'pyroclast flow danger'
+    Document IDs:
+        100, 1256, 13329, 14368, 14384, 14409, 14418, 14435, 14498, 14556
+        14667, 14845, 1533, 1582, 16276, 16322, 16344, 16392, 16450, 16573
+        16618, 16728, 16809, 16860, 17750, 17821, 17989, 18203, 18306, 18545
+        19633, 19835, 22301, 22308, 24365, 25884, 28414, 31521, 31529, 31535
+        31537, 31555, 31575, 31619, 31769, 34116, 34321, 34540, 6198, 6816
+
+Original Query:
+    pyroclastic flow danger
+
+Documents with URLs:
+    [100] https://pubs.usgs.gov/circ/c1050
+    [1256] https://www.usgs.gov/
+    [13329] https://www.usgs.gov/science/science-explorer/biology
+    [14368] https://www.usgs.gov/science/science-explorer/coasts
+    [14384] https://www.usgs.gov/science/science-explorer/climate
+    [14409] https://www.usgs.gov/search?keywords=energy
+    [14418] https://www.usgs.gov/search?keywords=environmental+health
+    [14435] https://www.usgs.gov/search?keywords=geology
+
+Query Term Correlation:
+    Formula: S(u,v) = (s_u · s_v) / (|s_u| × |s_v|)
+    Where s_u[j] = f(u, doc_j) for doc j in local set (document-frequency vectors on D_l).
+
+    Query stem 'pyroclast': Not found in local vocabulary
+
+    Query stem: 'flow'
+        Association vector norm |s_flow| = 4.1231
+        Appears in 6 local documents
+
+        Candidate Term          Dot Product      |s_v|       S(u,v)
+        -------------------- -------------- ---------- ------------
+        hammond                        8.00       2.24     0.867722
+        variabl                       10.00       2.83     0.857493
+        graviti                        5.00       1.41     0.857493
+        yearli                         5.00       1.41     0.857493
+        glenn                          5.00       1.41     0.857493
+        todd                           5.00       1.41     0.857493
+        caldwel                        5.00       1.41     0.857493
+        melissa                        5.00       1.41     0.857493
+        conu                           5.00       1.41     0.857493
+        dudley                         5.00       1.41     0.857493
+        wieczorek                      5.00       1.41     0.857493
+        lombard                        5.00       1.41     0.857493
+
+    Query stem 'danger': Not found in local vocabulary
+
+    Cluster selection: Cosine similarity ranks neighborhoods; scores boosted by
+    _score_expansion_term (IDF); merged in _finalize_expansion.
+
+Local Vocabulary Set:
+    Query stems (after preprocessing): ['pyroclast', 'flow', 'danger']
+    Total unique stems in local vocabulary: 1267
+    Alphabetic terms only: 1198
+    Terms appearing in 2+ local docs: 1267
+
+    Local vocabulary sample (first 80 alphabetical stems):
+        abund, acceler, accept, access, accur, achiev, acquisit, across, act, action
+        activ, adapt, addit, address, adjac, advanc, adventur, advers, advis, advisori
+        affect, age, agenc, agenda, agreement, agricultur, ahead, ahi, ai, aim
+        air, airborn, airplan, alaska, alert, allow, almost, along, also, altern
+        america, american, among, analysi, analyt, analyz, anim, announc, annual, answer
+        antarct, anticip, appli, applic, approach, april, aquadepth, aquat, aquif, archiv
+        area, arizona, arm, aroostook, around, array, art, articl, artifici, arundel
+        asist, ask, aspect, assess, assist, associ, astrogeolog, atlant, attribut, august
+
+Expanded Query:
+    pyroclastic flow dangerous caelan
+
+Top 10 results (HITS) on the expanded query:
+    1. doc_id=1533 | https://earthquake.usgs.gov/earthquakes/map
+    2. doc_id=100 | https://pubs.usgs.gov/circ/c1050
+    3. doc_id=1256 | https://www.usgs.gov/
+    4. doc_id=1582 | https://www.usgs.gov/science/faqs
+    5. doc_id=14409 | https://www.usgs.gov/search?keywords=energy
+    6. doc_id=14418 | https://www.usgs.gov/search?keywords=environmental+health
+    7. doc_id=14435 | https://www.usgs.gov/search?keywords=geology
+    8. doc_id=14667 | https://www.usgs.gov/search?keywords=information+systems
+    9. doc_id=16618 | https://www.usgs.gov/search?keywords=water
+   10. doc_id=17821 | https://www.usgs.gov/news/news-releases
+
+
+────────────────────────────────────────────────────────────────────────────────
+SUB-QUERY C2
+────────────────────────────────────────────────────────────────────────────────
+
+Local Document Set:
+    Number of documents: 50
+    Method: Top-50 HITS on normalized query 'metamorph gneiss format'
+    Document IDs:
+        100, 1256, 13329, 14368, 14384, 14409, 14418, 14435, 14498, 14556
+        14667, 14845, 1533, 1582, 16207, 16276, 16322, 16344, 16392, 16450
+        16573, 16618, 16728, 16809, 16860, 16919, 17821, 17989, 18203, 18306
+        18545, 18666, 19633, 22301, 22308, 24365, 28414, 31513, 31529, 31535
+        31537, 31555, 31575, 31619, 31769, 34116, 34321, 34540, 6198, 6262
+
+Original Query:
+    metamorphic gneiss formation
+
+Documents with URLs:
+    [100] https://pubs.usgs.gov/circ/c1050
+    [1256] https://www.usgs.gov/
+    [13329] https://www.usgs.gov/science/science-explorer/biology
+    [14368] https://www.usgs.gov/science/science-explorer/coasts
+    [14384] https://www.usgs.gov/science/science-explorer/climate
+    [14409] https://www.usgs.gov/search?keywords=energy
+    [14418] https://www.usgs.gov/search?keywords=environmental+health
+    [14435] https://www.usgs.gov/search?keywords=geology
+
+Query Term Correlation:
+    Formula: S(u,v) = (s_u · s_v) / (|s_u| × |s_v|)
+    Where s_u[j] = f(u, doc_j) for doc j in local set (document-frequency vectors on D_l).
+
+    Query stem 'metamorph': Not found in local vocabulary
+    Query stem 'gneiss': Not found in local vocabulary
+
+    Query stem: 'format'
+        Association vector norm |s_format| = 12.3288
+        Appears in 5 local documents
+
+        Candidate Term          Dot Product      |s_v|       S(u,v)
+        -------------------- -------------- ---------- ------------
+        scan                          78.00       7.81     0.810043
+        topograph                   1060.00     106.18     0.809703
+        smooth                        41.00       4.12     0.806562
+        custom                       180.00      18.14     0.804920
+        compil                        40.00       4.12     0.786889
+        built                         40.00       4.12     0.786889
+        schedul                       40.00       4.12     0.786889
+        demand                        71.00       7.48     0.769560
+        territori                     40.00       4.36     0.744323
+        transit                       42.00       4.58     0.743392
+        abstract                      20.00       2.24     0.725476
+        chart                         20.00       2.24     0.725476
+
+    Cluster selection: Cosine similarity ranks neighborhoods; scores boosted by
+    _score_expansion_term (IDF); merged in _finalize_expansion.
+
+Local Vocabulary Set:
+    Query stems (after preprocessing): ['metamorph', 'gneiss', 'format']
+    Total unique stems in local vocabulary: 1320
+    Alphabetic terms only: 1249
+    Terms appearing in 2+ local docs: 1320
+
+    Local vocabulary sample (first 80 alphabetical stems):
+        abil, abstract, abund, acceler, access, accru, accur, achiev, acquisit, across
+        act, action, activ, adapt, addit, address, adjac, advanc, advantag, advers
+        advis, advisori, affect, age, agenc, agenda, agreement, agricultur, ahead, ahi
+        ai, aim, air, airborn, airplan, ak, alaska, alert, alm, almost
+        along, also, alter, altern, america, american, among, analysi, analyt, analyz
+        anim, announc, annual, anoth, answer, anticip, appli, applic, approach, appropri
+        approxim, april, aquadepth, aquat, aquif, archiv, arctic, area, arizona, arm
+        aroostook, around, array, art, articl, artifici, arundel, asist, ask, aspect
+
+Expanded Query:
+    metamorphic gneiss formation frye civilian
+
+Top 10 results (HITS) on the expanded query:
+    1. doc_id=1533 | https://earthquake.usgs.gov/earthquakes/map
+    2. doc_id=100 | https://pubs.usgs.gov/circ/c1050
+    3. doc_id=1256 | https://www.usgs.gov/
+    4. doc_id=1582 | https://www.usgs.gov/science/faqs
+    5. doc_id=14418 | https://www.usgs.gov/search?keywords=environmental+health
+    6. doc_id=14435 | https://www.usgs.gov/search?keywords=geology
+    7. doc_id=14667 | https://www.usgs.gov/search?keywords=information+systems
+    8. doc_id=16618 | https://www.usgs.gov/search?keywords=water
+    9. doc_id=14409 | https://www.usgs.gov/search?keywords=energy
+   10. doc_id=14556 | https://www.usgs.gov/regions/southwest
+
+
+────────────────────────────────────────────────────────────────────────────────
+SUB-QUERY C3
+────────────────────────────────────────────────────────────────────────────────
+
+Local Document Set:
+    Number of documents: 50
+    Method: Top-50 HITS on normalized query 'groundwat aquif permeabl'
+    Document IDs:
+        100, 1256, 13329, 14368, 14384, 14409, 14418, 14435, 14498, 14556
+        14667, 14845, 1533, 1582, 16207, 16276, 16322, 16344, 16392, 16450
+        16573, 16618, 16728, 16809, 17750, 17821, 17989, 18203, 18306, 18545
+        18666, 19633, 22308, 24365, 28414, 31521, 31529, 31535, 31537, 31555
+        31575, 31585, 31619, 31769, 34116, 34321, 34540, 6198, 6262, 6816
+
+Original Query:
+    groundwater aquifer permeability
+
+Documents with URLs:
+    [100] https://pubs.usgs.gov/circ/c1050
+    [1256] https://www.usgs.gov/
+    [13329] https://www.usgs.gov/science/science-explorer/biology
+    [14368] https://www.usgs.gov/science/science-explorer/coasts
+    [14384] https://www.usgs.gov/science/science-explorer/climate
+    [14409] https://www.usgs.gov/search?keywords=energy
+    [14418] https://www.usgs.gov/search?keywords=environmental+health
+    [14435] https://www.usgs.gov/search?keywords=geology
+
+Query Term Correlation:
+    Formula: S(u,v) = (s_u · s_v) / (|s_u| × |s_v|)
+    Where s_u[j] = f(u, doc_j) for doc j in local set (document-frequency vectors on D_l).
+
+    Query stem: 'groundwat'
+        Association vector norm |s_groundwat| = 9.8995
+        Appears in 8 local documents
+
+        Candidate Term          Dot Product      |s_v|       S(u,v)
+        -------------------- -------------- ---------- ------------
+        variabl                       24.00       2.83     0.857143
+        graviti                       12.00       1.41     0.857143
+        metric                        12.00       1.41     0.857143
+        contermin                     12.00       1.41     0.857143
+        yearli                        12.00       1.41     0.857143
+        glenn                         12.00       1.41     0.857143
+        todd                          12.00       1.41     0.857143
+        caldwel                       12.00       1.41     0.857143
+        melissa                       12.00       1.41     0.857143
+        conu                          12.00       1.41     0.857143
+        dudley                        12.00       1.41     0.857143
+        wieczorek                     12.00       1.41     0.857143
+
+    Query stem: 'aquif'
+        Association vector norm |s_aquif| = 4.3589
+        Appears in 5 local documents
+
+        Candidate Term          Dot Product      |s_v|       S(u,v)
+        -------------------- -------------- ---------- ------------
+        subsurfac                      7.00       2.24     0.718185
+        freshwat                      18.00       6.08     0.678883
+        cold                           9.00       3.16     0.652929
+        midwestern                     8.00       2.83     0.648886
+        roosevelt                      4.00       1.41     0.648886
+        iowa                           4.00       1.41     0.648886
+        curri                          4.00       1.41     0.648886
+        biogeochem                     4.00       1.41     0.648886
+        missouri                       4.00       1.41     0.648886
+        aroostook                      4.00       1.41     0.648886
+        parmer                         4.00       1.41     0.648886
+        northeastern                  14.00       5.00     0.642364
+
+    Query stem 'permeabl': Not found in local vocabulary
+
+    Cluster selection: Cosine similarity ranks neighborhoods; scores boosted by
+    _score_expansion_term (IDF); merged in _finalize_expansion.
+
+Local Vocabulary Set:
+    Query stems (after preprocessing): ['groundwat', 'aquif', 'permeabl']
+    Total unique stems in local vocabulary: 1259
+    Alphabetic terms only: 1193
+    Terms appearing in 2+ local docs: 1259
+
+    Local vocabulary sample (first 80 alphabetical stems):
+        abstract, abund, access, accur, acquisit, across, act, action, activ, adapt
+        addit, address, adjac, advanc, advers, advis, advisori, affect, age, agenc
+        agenda, agreement, agricultur, ahead, ahi, ai, airborn, airplan, ak, alaska
+        alert, allow, almost, along, also, alter, america, american, among, analysi
+        analyt, analyz, anim, announc, annual, answer, anticip, applic, approach, appropri
+        approxim, april, aquadepth, aquat, aquif, archiv, arctic, area, arizona, arm
+        aroostook, around, array, art, articl, artifici, arundel, ask, aspect, assess
+        assist, associ, astrogeolog, atlant, attribut, august, australia, author, authorit, autom
+
+Expanded Query:
+    groundwater aquifer permeability caelan
+
+Top 10 results (HITS) on the expanded query:
+    1. doc_id=1533 | https://earthquake.usgs.gov/earthquakes/map
+    2. doc_id=100 | https://pubs.usgs.gov/circ/c1050
+    3. doc_id=1256 | https://www.usgs.gov/
+    4. doc_id=1582 | https://www.usgs.gov/science/faqs
+    5. doc_id=14418 | https://www.usgs.gov/search?keywords=environmental+health
+    6. doc_id=14435 | https://www.usgs.gov/search?keywords=geology
+    7. doc_id=14667 | https://www.usgs.gov/search?keywords=information+systems
+    8. doc_id=14409 | https://www.usgs.gov/search?keywords=energy
+    9. doc_id=16618 | https://www.usgs.gov/search?keywords=water
+   10. doc_id=18203 | https://www.usgs.gov/regions/northeast-region
+
+
+================================================================================
+END OF REPORT — Uddesh Singh | UXS230004
+================================================================================

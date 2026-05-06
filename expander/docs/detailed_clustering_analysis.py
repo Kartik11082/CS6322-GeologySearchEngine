@@ -12,13 +12,14 @@ import math
 from pathlib import Path
 from collections import defaultdict
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(PROJECT_ROOT / "indexer" / "src"))
-sys.path.insert(0, str(PROJECT_ROOT / "expander"))
+REPO_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO_ROOT / "indexer" / "src"))
+sys.path.insert(0, str(REPO_ROOT / "expander"))
 
 from search import SearchEngine
 from core import QueryExpander, EXPANSION_STOPLIST
 from preprocessor import preprocess
+from query_sets import m_neighbors_for_query
 
 # Three example queries from different geology domains
 EXAMPLE_QUERIES = [
@@ -49,22 +50,36 @@ def analyze_query_with_method(engine: SearchEngine, expander: QueryExpander,
     query_stem_set = set(query_stems)
     query_len = len(query_stems)
     
-    # Get local document set (top-50 BM25)
+    # Get local document set (top-50 HITS — same as QueryExpander._get_local_doc_set)
     local_doc_ids = expander._get_local_doc_set(query, top_k=50)
     
     # Get local term frequencies
     local_tf = expander._get_local_term_frequencies(local_doc_ids)
     
-    # Get expanded query using the method
+    m_neighbors = m_neighbors_for_query(query)
+    # Get expanded query using the method (max_new_terms aligned with backend /api/expand)
     if method == "association":
-        expanded = expander.expand_association(query, top_k_docs=50, m_neighbors=4, 
-                                                normalized=True, max_new_terms=6)
+        expanded = expander.expand_association(
+            query,
+            top_k_docs=50,
+            m_neighbors=m_neighbors,
+            normalized=True,
+            max_new_terms=5,
+        )
     elif method == "scalar":
-        expanded = expander.expand_scalar(query, top_k_docs=50, m_neighbors=4, 
-                                           max_new_terms=6)
+        expanded = expander.expand_scalar(
+            query,
+            top_k_docs=50,
+            m_neighbors=m_neighbors,
+            max_new_terms=5,
+        )
     elif method == "metric":
-        expanded = expander.expand_metric(query, top_k_docs=50, m_neighbors=4, 
-                                           max_new_terms=4)
+        expanded = expander.expand_metric(
+            query,
+            top_k_docs=50,
+            m_neighbors=m_neighbors,
+            max_new_terms=5,
+        )
     
     return {
         "original_query": query,
@@ -207,9 +222,8 @@ def compute_metric_correlations(expander: QueryExpander, engine: SearchEngine,
     return correlations_by_stem
 
 def get_search_results(engine: SearchEngine, query: str, top_k: int = 10):
-    """Get search results with URLs."""
-    results = engine.search(query, method="bm25", top_k=top_k)
-    return results
+    """Match expansion_report /api/expand default post-expansion ranker."""
+    return engine.search(query, method="hits", top_k=top_k)
 
 def main():
     print("Loading Search Engine...")
@@ -219,7 +233,7 @@ def main():
     
     print(f"Loaded: {engine.N:,} documents, {len(engine.inverted_index):,} terms")
     
-    output_path = PROJECT_ROOT / "expander" / "clustering_detailed_report.txt"
+    output_path = REPO_ROOT / "expander" / "clustering_detailed_report.txt"
     
     with open(output_path, "w", encoding="utf-8") as f:
         def write(text=""):

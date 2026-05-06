@@ -1,0 +1,19 @@
+Number of documents: 50
+Method: Top-50 HITS on normalized query 'metamorph gneiss format' (same as QueryExpander._get_local_doc_set / backend local set)
+
+Document IDs:
+    100, 1256, 13329, 14368, 14384, 14409, 14418, 14435, 14498, 14556
+    14667, 14845, 1533, 1582, 16207, 16276, 16322, 16344, 16392, 16450
+    16573, 16618, 16728, 16809, 16860, 16919, 17821, 17989, 18203, 18306
+    18545, 18666, 19633, 22301, 22308, 24365, 28414, 31513, 31529, 31535
+    31537, 31555, 31575, 31619, 31769, 34116, 34321, 34540, 6198, 6262
+
+Sample Documents with URLs:
+    [100] https://pubs.usgs.gov/circ/c1050
+    [1256] https://www.usgs.gov/
+    [13329] https://www.usgs.gov/science/science-explorer/biology
+    [14368] https://www.usgs.gov/science/science-explorer/coasts
+    [14384] https://www.usgs.gov/science/science-explorer/climate
+    [14409] https://www.usgs.gov/search?keywords=energy
+    [14418] https://www.usgs.gov/search?keywords=environmental+health
+    [14435] https://www.usgs.gov/search?keywords=geology

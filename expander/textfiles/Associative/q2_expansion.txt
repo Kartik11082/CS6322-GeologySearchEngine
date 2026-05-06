@@ -1,0 +1,18 @@
+(4) EXPANDED QUERY AND SEARCH ENGINE RESULTS
+
+Expanded query: metamorphic gneiss formation frye smooth
+
+Top 10 results (HITS) on the expanded query:
+
+   1. doc_id=1533 | https://earthquake.usgs.gov/earthquakes/map
+   2. doc_id=100 | https://pubs.usgs.gov/circ/c1050
+   3. doc_id=1256 | https://www.usgs.gov/
+   4. doc_id=1582 | https://www.usgs.gov/science/faqs
+   5. doc_id=14418 | https://www.usgs.gov/search?keywords=environmental+health
+   6. doc_id=14435 | https://www.usgs.gov/search?keywords=geology
+   7. doc_id=14667 | https://www.usgs.gov/search?keywords=information+systems
+   8. doc_id=16618 | https://www.usgs.gov/search?keywords=water
+   9. doc_id=14409 | https://www.usgs.gov/search?keywords=energy
+  10. doc_id=14556 | https://www.usgs.gov/regions/southwest
+
+Report note: Compare these URLs to a HITS run on the original query; discuss whether expansion helped topical precision or introduced drift.
