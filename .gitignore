@@ -78,3 +78,7 @@ crawler/lib/vis-9.1.2/vis-network.css
 crawler/lib/vis-9.1.2/vis-network.min.js
 crawler/test.py
 crawler/graph.html
+search-engine/UI_Report.docx
+search-engine/UI_Report.md
+search-engine/images/*
+cluster_service/output_old/
