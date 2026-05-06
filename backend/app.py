@@ -61,8 +61,8 @@ class SearchRequest(BaseModel):
         ..., description="The query string to search for. Must not be empty."
     )
     method: str = Field(
-        "bm25",
-        description="The ranking algorithm to use (tfidf, bm25, pagerank, hits).",
+        "hits",
+        description="The ranking algorithm to use (tfidf, pagerank, hits, tfidf_pagerank, tfidf_hits).",
     )
     top_k: int = Field(10, ge=1, le=100, description="Number of results to return.")
 
@@ -80,7 +80,6 @@ async def perform_search(req: SearchRequest):
 
     valid_methods = {
         "tfidf",
-        "bm25",
         "pagerank",
         "hits",
         "tfidf_pagerank",
@@ -119,12 +118,17 @@ class ExpandRequest(BaseModel):
         "association",
         description="Expansion method: rocchio, association, scalar, metric.",
     )
-    top_k: int = Field(10, ge=1, le=100, description="Number of results for the final search.")
+    top_k: int = Field(
+        10, ge=1, le=100, description="Number of results for the final search."
+    )
     relevant_doc_ids: list[str] = Field(
         default_factory=list, description="For Rocchio: IDs of relevant docs."
     )
     irrelevant_doc_ids: list[str] = Field(
         default_factory=list, description="For Rocchio: IDs of non-relevant docs."
+    )
+    search_method: str = Field(
+        default="hits", description="Ranking method for the final search after expansion."
     )
 
 
@@ -185,9 +189,7 @@ async def perform_expansion(req: ExpandRequest):
                 detail=f"Invalid expansion method: {req.method}",
             )
 
-        results = engine.search(
-            query=expanded_query, method="bm25", top_k=req.top_k
-        )
+        results = engine.search(query=expanded_query, method=req.search_method, top_k=req.top_k)
 
     except HTTPException:
         raise

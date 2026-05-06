@@ -259,7 +259,7 @@ class QueryExpander:
     # =====================================================================
     def _get_local_doc_set(self, query: str, top_k: int) -> set[str]:
         normalized_query = self._normalize_query_for_expansion(query)
-        results = self.engine.search(normalized_query, method="bm25", top_k=top_k)
+        results = self.engine.search(normalized_query, method="hits", top_k=top_k)
         return {str(res["doc_id"]) for res in results}
 
     def _get_local_term_frequencies(self, local_doc_ids: set[str]):

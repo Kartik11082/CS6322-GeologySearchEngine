@@ -20,7 +20,6 @@ SERPAPI_URL = "https://serpapi.com/search"
 SEARCH_METHOD_ALIASES = {"combined": "pagerank"}
 VALID_SEARCH_METHODS = {
     "tfidf",
-    "bm25",
     "pagerank",
     "hits",
     "tfidf_pagerank",
@@ -174,16 +173,17 @@ def normalize_external_results(items: list[dict], top_k: int) -> list[dict]:
 
 class SearchRequest(BaseModel):
     query: str = Field(..., validation_alias=AliasChoices("query", "q"))
-    method: str = Field(default="bm25")
+    method: str = Field(default="hits")
     top_k: int = Field(default=10, ge=1, le=50)
 
 
 class ExpandRequest(BaseModel):
     query: str
-    method: Literal["rocchio", "association", "scalar", "metric"] = "association"
+    method: Literal["rocchio", "association", "scalar", "metric"] = "scalar"
     top_k: int = Field(default=10, ge=1, le=20)
     relevant_doc_ids: list[str] = Field(default_factory=list)
     irrelevant_doc_ids: list[str] = Field(default_factory=list)
+    search_method: str = Field(default="hits")
 
 
 class ClusteredSearchRequest(BaseModel):

@@ -69,7 +69,9 @@ def _ctfidf_labels(
     class_docs = []
     for cluster_id in ordered_ids:
         joined = " ".join(
-            record.clustering_text for record, label in zip(records, labels) if int(label) == cluster_id
+            record.clustering_text
+            for record, label in zip(records, labels)
+            if int(label) == cluster_id
         )
         class_docs.append(joined or "empty")
 
@@ -173,7 +175,9 @@ def _fit_flat(
             max_iter=cfg.kmeans_max_iter,
         )
         sample_labels = model.fit_predict(sample_vectors)
-        silhouette, dbi = _score_clustering(sample_vectors, sample_labels, metric="euclidean")
+        silhouette, dbi = _score_clustering(
+            sample_vectors, sample_labels, metric="euclidean"
+        )
         row = {
             "k": int(k),
             "silhouette": round(silhouette, 4),
@@ -187,7 +191,11 @@ def _fit_flat(
     model = fitted_models[int(best["k"])]
     full_labels = model.predict(full_vectors).astype(int)
     centroids = l2_normalize(model.cluster_centers_.astype(np.float32))
-    return full_labels, centroids, {"candidate_scores": candidate_rows, "selected": best}
+    return (
+        full_labels,
+        centroids,
+        {"candidate_scores": candidate_rows, "selected": best},
+    )
 
 
 def _fit_mini_clusters(
@@ -233,7 +241,9 @@ def _fit_agglomerative(
             metric=metric,
         )
         labels = model.fit_predict(evaluation_vectors).astype(int)
-        silhouette, dbi = _score_clustering(evaluation_vectors, labels, metric=eval_metric)
+        silhouette, dbi = _score_clustering(
+            evaluation_vectors, labels, metric=eval_metric
+        )
         row = {
             "k": int(k),
             "silhouette": round(silhouette, 4),
@@ -286,8 +296,12 @@ def run_build(
         mini_labels, mini_centers, full_vectors, "complete", cfg.agg_k_candidates
     )
 
-    flat_names = _ctfidf_labels(corpus.records, flat_labels, projector.vectorizer, cfg.cluster_top_terms)
-    ward_names = _ctfidf_labels(corpus.records, ward_labels, projector.vectorizer, cfg.cluster_top_terms)
+    flat_names = _ctfidf_labels(
+        corpus.records, flat_labels, projector.vectorizer, cfg.cluster_top_terms
+    )
+    ward_names = _ctfidf_labels(
+        corpus.records, ward_labels, projector.vectorizer, cfg.cluster_top_terms
+    )
     complete_names = _ctfidf_labels(
         corpus.records, complete_labels, projector.vectorizer, cfg.cluster_top_terms
     )
@@ -323,8 +337,14 @@ def run_build(
             "url": record.url,
             "title": record.title,
             "domain": record.domain,
-            "flat": {"id": int(flat_labels[idx]), "name": flat_names[int(flat_labels[idx])]},
-            "ward": {"id": int(ward_labels[idx]), "name": ward_names[int(ward_labels[idx])]},
+            "flat": {
+                "id": int(flat_labels[idx]),
+                "name": flat_names[int(flat_labels[idx])],
+            },
+            "ward": {
+                "id": int(ward_labels[idx]),
+                "name": ward_names[int(ward_labels[idx])],
+            },
             "complete": {
                 "id": int(complete_labels[idx]),
                 "name": complete_names[int(complete_labels[idx])],

@@ -138,9 +138,9 @@ async function requestJson(path, { method = "GET", body } = {}) {
   return data;
 }
 
-async function buildExpandBody(query, expansionMethod, topK) {
+async function buildExpandBody(query, expansionMethod, topK, searchMethod = "hits") {
   if (expansionMethod !== "rocchio") {
-    return { query, method: expansionMethod, top_k: topK };
+    return { query, method: expansionMethod, top_k: topK, search_method: searchMethod };
   }
 
   const baseline = await requestJson("/api/search", {
@@ -155,7 +155,7 @@ async function buildExpandBody(query, expansionMethod, topK) {
   fetch('http://127.0.0.1:7676/ingest/42b47de6-4aeb-471e-a7f7-2c4cc9c845e0', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '784b16' }, body: JSON.stringify({ sessionId: '784b16', runId: 'post-fix', hypothesisId: 'H5', location: 'search-engine/frontend/src/App.jsx:buildExpandBody', message: 'rocchio feedback docs derived from bm25', data: { query, relevantCount: relevant_doc_ids.length, irrelevantCount: irrelevant_doc_ids.length }, timestamp: Date.now() }) }).catch(() => { });
   // #endregion
 
-  return { query, method: expansionMethod, top_k: topK, relevant_doc_ids, irrelevant_doc_ids };
+  return { query, method: expansionMethod, top_k: topK, relevant_doc_ids, irrelevant_doc_ids, search_method: searchMethod };
 }
 
 /* ================================================================
@@ -509,7 +509,7 @@ function ClusteredPane({ panel, activeClusterId, setActiveClusterId, clusterMeth
 /* ================================================================
    EXPANDED PANE
    ================================================================ */
-function ExpandedPane({ panel, searchQuery, expansionMethod }) {
+function ExpandedPane({ panel, searchQuery, expansionMethod, expandSearchMethod, setExpandSearchMethod }) {
   const status = getStatus(panel, "Run a query to inspect expansion output.");
   if (status) {
     return (
@@ -539,6 +539,21 @@ function ExpandedPane({ panel, searchQuery, expansionMethod }) {
           <span className="info-tip" aria-label="The original query is expanded with terms from a co-occurrence cluster over top-ranked documents, then re-searched using the same relevance model.">?</span>
         </h2>
         <PaneAttrib who="expand" />
+      </div>
+
+      <div className="cmp-controls">
+        <label className="ctl">
+          <span className="ctl-lbl">Search model</span>
+          <select value={expandSearchMethod} onChange={(e) => setExpandSearchMethod(e.target.value)}>
+            {[
+              { value: "tfidf", label: "TF-IDF" },
+              { value: "pagerank", label: "PageRank" },
+              { value: "hits", label: "HITS" },
+              { value: "tfidf_pagerank", label: "TF-IDF + PageRank" },
+              { value: "tfidf_hits", label: "TF-IDF + HITS" },
+            ].map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+        </label>
       </div>
 
       <div className="expbanner">
@@ -574,7 +589,7 @@ function ExpandedPane({ panel, searchQuery, expansionMethod }) {
 function getGeoPanel(results, source) {
   if (source === "clustered") return results.clustered;
   if (source === "expanded") return results.expanded;
-  return results.models[source] ?? results.models.bm25;
+  return results.models[source] ?? results.models.tfidf;
 }
 
 function getGeoItems(data, source) {
@@ -914,6 +929,7 @@ export default function App() {
   const [clusterMethod, setClusterMethod] = useState(initial.clusterMethod);
   const [activeTab, setActiveTab] = useState(initial.tab);
   const [activeModel, setActiveModel] = useState("tfidf");
+  const [expandSearchMethod, setExpandSearchMethod] = useState("hits");
   const [activeClusterId, setActiveClusterId] = useState(null);
   const [results, setResults] = useState(createInitialResults);
   const [lastSearch, setLastSearch] = useState(initial.query);
@@ -946,12 +962,12 @@ export default function App() {
     startTransition(() =>
       setResults((cur) => ({ ...cur, expanded: { status: "loading", data: null, error: "" } })),
     );
-    buildExpandBody(lastSearch, expansionMethod, topK)
+    buildExpandBody(lastSearch, expansionMethod, topK, expandSearchMethod)
       .then((expandBody) => requestJson("/api/expand", { method: "POST", body: expandBody }))
       .then((data) => patchResults(rid, (cur) => ({ ...cur, expanded: { status: "success", data, error: "" } })))
       .catch((err) => patchResults(rid, (cur) => ({ ...cur, expanded: { status: "error", data: null, error: err.message } })));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expansionMethod]);
+  }, [expansionMethod, expandSearchMethod]);
 
   const didMountClusterRef = useRef(false);
   useEffect(() => {
@@ -1029,7 +1045,7 @@ export default function App() {
         );
     });
 
-    buildExpandBody(q, expansionMethod, topK)
+    buildExpandBody(q, expansionMethod, topK, expandSearchMethod)
       .then((expandBody) => requestJson("/api/expand", { method: "POST", body: expandBody }))
       .then((data) => {
         // #region agent log
@@ -1112,6 +1128,8 @@ export default function App() {
             panel={results.expanded}
             searchQuery={lastSearch}
             expansionMethod={expansionMethod}
+            expandSearchMethod={expandSearchMethod}
+            setExpandSearchMethod={setExpandSearchMethod}
           />
         )}
         {activeTab === "compare" && (
